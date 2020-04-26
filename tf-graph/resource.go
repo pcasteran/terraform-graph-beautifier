@@ -1,4 +1,4 @@
-package tf_graph
+package tfgraph
 
 type Resource struct {
 	// Embed AbstractConfigurationComponent.

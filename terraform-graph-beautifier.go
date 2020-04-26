@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/awalterschulze/gographviz"
-	tf_graph "github.com/pcasteran/terraform-graph-beautifier/tf-graph"
+	"github.com/pcasteran/terraform-graph-beautifier/tf-graph"
 	"io/ioutil"
 	"log"
 	"os"
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Reconstruct the Terraform resources hierarchy.
-	root := tf_graph.NewModule(nil, "root")
+	root := tfgraph.NewModule(nil, "root")
 	for _, node := range graphIn.Nodes.Nodes {
 		// TODO : temp for test
 		fmt.Println(node.Name)
@@ -59,9 +59,9 @@ func main() {
 			}
 
 			moduleName := matches[1]
-			childModule, ok := module.Children[moduleName].(*tf_graph.Module)
+			childModule, ok := module.Children[moduleName].(*tfgraph.Module)
 			if !ok {
-				childModule = tf_graph.NewModule(module, moduleName)
+				childModule = tfgraph.NewModule(module, moduleName)
 				module.Children[moduleName] = childModule
 			}
 			module = childModule
@@ -70,7 +70,7 @@ func main() {
 
 		// Add a resource node to the current module.
 		// TODO
-		module.AddChild(&tf_graph.AbstractConfigurationComponent{
+		module.AddChild(&tfgraph.AbstractConfigurationComponent{
 			Parent: nil,
 			Name:   resourceQualifiedName,
 		})
