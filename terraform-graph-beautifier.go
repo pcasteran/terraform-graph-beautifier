@@ -46,7 +46,6 @@ func main() {
 
 		// Get the TF resource qualified name from the 'label' attribute
 		// and find its parent module sub-graph(es).
-		// TODO : use name instead of label
 		resourceQualifiedName := strings.ReplaceAll(node.Attrs[gographviz.Label], "\"", "")
 		module := root
 		for {
@@ -96,9 +95,3 @@ func main() {
 	_, _ = fo.WriteString(output)
 }
 
-// TODO : tester modules imbriqués
-// Attribute "tf-type"
-// TODO : shape box(ressource), arrondi(var, local), ?? (output)
-//"[root] module.cloudfunction.module.storage.google_storage_bucket.buckets["artefacts"] (orphan)" [label = "module.cloudfunction.module.storage.google_storage_bucket.buckets", shape = "box"]
-//   Voir (orphan)
-//   Corriger label
