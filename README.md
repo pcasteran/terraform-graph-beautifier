@@ -2,8 +2,6 @@
 Terraform graph beautifier
 
 ## TODO
-- Param `--input=file`, default `stdin`
-- Param `--verbose`, logging sur stderr
 - Dans samples, configs TF de tests
   - TF only (local file, random) avec:
     - modules imbriqués
@@ -29,3 +27,4 @@ tf-types:
 - Name : remplacer "[root] " par "root."
 - Exemples utilisation [`sfdp`](https://linux.die.net/man/1/sfdp)
 - Github actions to build
+- Virer junk (--keep-tf-junk)

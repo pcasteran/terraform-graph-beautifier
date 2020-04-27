@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
 	"github.com/awalterschulze/gographviz"
-	"github.com/pcasteran/terraform-graph-beautifier/tf-graph"
-	"io/ioutil"
-	"log"
+	tfgraph "github.com/pcasteran/terraform-graph-beautifier/tf-graph"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"os"
 	"regexp"
 	"strings"
@@ -15,33 +17,76 @@ var /* const */ tfResourceRegex = regexp.MustCompile(`^"\[root] (.*)"$`)
 var /* const */ tfModuleRegex = regexp.MustCompile(`module\.(.*?)\.(.*)`)
 
 func main() {
-	// Read the input file.
-	path := "samples/tf_plan.gv"
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatal(err)
+	// Parse command line arguments.
+	inputFilePath := flag.String("input", "", "Path of the input Graphviz file to read, if not set reads stdin")
+	debug := flag.Bool("debug", false, "Prints debugging information to stderr")
+	flag.Parse()
+
+	// Configure logging.
+	// Default level for this example is info, unless debug flag is present.
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if *debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	// Read the input line by line.
+	var file *os.File
+	var err error
+	if *inputFilePath == "" {
+		// Read from stdin.
+		file = os.Stdin
+		err = nil
+	} else {
+		// Read from input file.
+		file, err = os.Open(*inputFilePath)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Cannot open specified file")
+		}
+		defer file.Close()
 	}
 
-	// Fix some issues with the Terraform output.
-	// Replace entries : map["foo"] => map['foo']
-	re := regexp.MustCompile(`\["(.*?)"]`)
-	b = re.ReplaceAll(b, []byte("['${1}']"))
+	scanner := bufio.NewScanner(file)
+	var sb strings.Builder
+	for scanner.Scan() {
+		line := scanner.Text()
 
-	// Read the input graph.
-	graphIn, err := gographviz.Read(b)
+		// Fix some issues with the Terraform output.
+		// Replace entries : map["foo"] => map['foo']
+		// TODO : const
+		re := regexp.MustCompile(`\["(.*?)"]`)
+		line2 := re.ReplaceAllString(line, "['${1}']")
+		if line != line2 {
+			log.
+				Debug().
+				Str("before", line).
+				Str("after", line2).
+				Msg("Line fixed")
+			line = line2
+		}
+
+		sb.WriteString(line + "\n")
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal().Err(err).Msg("Error while reading input")
+	}
+
+	// Load the Graphviz graph from the input.
+	graphIn, err := gographviz.Read([]byte(sb.String()))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("Unable to parse the input as a Graphviz graph")
 	}
 
 	// Reconstruct the Terraform resources hierarchy.
 	root := tfgraph.NewModule(nil, "root")
 	for _, node := range graphIn.Nodes.Nodes {
-		// TODO : temp for test
-		fmt.Println(node.Name)
-
 		// Check node name.
 		if !tfResourceRegex.MatchString(node.Name) {
-			log.Fatal("Invalid node name : ", node.Name)
+			log.Fatal().
+				Err(err).
+				Str("name", node.Name).
+				Msg("Invalid node name")
 		}
 
 		// Get the TF resource qualified name from the 'label' attribute
@@ -80,7 +125,8 @@ func main() {
 	graphOut.Name = "" // TODO : name or current directory
 	graphOut.Directed = true
 
-	output := graphOut.String()
+	// TODO : temp for tests
+	output := graphIn.String()
 	fmt.Println(output)
 
 	fo, err := os.Create("output.gv")
@@ -94,4 +140,3 @@ func main() {
 	}()
 	_, _ = fo.WriteString(output)
 }
-
