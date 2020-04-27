@@ -27,4 +27,4 @@ tf-types:
 - Name : remplacer "[root] " par "root."
 - Exemples utilisation [`sfdp`](https://linux.die.net/man/1/sfdp)
 - Github actions to build
-- Virer junk (--keep-tf-junk)
+- compound="true"; newrank="true";
