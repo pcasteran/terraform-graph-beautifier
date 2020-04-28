@@ -41,3 +41,5 @@ tf-types:
     - a configuration file (can be checked-in alongside your Terraform configuration)
     - command line arguments
     if both are used, command line arguments take precedence : check if some params can be merged
+- output param
+- leading "." on GetQualifiedName()

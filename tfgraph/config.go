@@ -66,16 +66,16 @@ func (e *BaseConfigElement) GetTfType() string {
 }
 
 type Dependency struct {
-	// This element depends on the `dst` element.
-	src ConfigElement
+	// This element depends on the `Dst` element.
+	Src ConfigElement
 
-	// This element is a dependency of the `src` element.
-	dst ConfigElement
+	// This element is a dependency of the `Src` element.
+	Dst ConfigElement
 }
 
 func NewDependency(src ConfigElement, dst ConfigElement) *Dependency {
 	return &Dependency{
-		src: src,
-		dst: dst,
+		Src: src,
+		Dst: dst,
 	}
 }

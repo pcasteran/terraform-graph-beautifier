@@ -72,7 +72,7 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 				Msg("Edge destination is referencing an invalid node")
 		}
 
-		edges = append(edges, &Dependency{src: src, dst: dst})
+		edges = append(edges, &Dependency{Src: src, Dst: dst})
 	}
 
 	// Return the "root" module and the edges.

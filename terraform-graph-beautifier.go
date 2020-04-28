@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/awalterschulze/gographviz"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -31,25 +29,8 @@ func main() {
 	graphIn := LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
 	// Build the Terraform resource graph.
-	_, _ = /*tfGraph :=*/ tfgraph.BuildTfGraphFromGraphviz(graphIn)
+	tfGraph, dependencies := tfgraph.BuildTfGraphFromGraphviz(graphIn)
 
-	// Build the output Graphviz graph.
-	graphOut := gographviz.NewGraph()
-	graphOut.Name = "" // TODO : name or current directory
-	graphOut.Directed = true
-
-	// TODO : temp for tests
-	output := graphIn.String()
-	fmt.Println(output)
-
-	fo, err := os.Create("samples/output.gv")
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err := fo.Close(); err != nil {
-			panic(err)
-		}
-	}()
-	_, _ = fo.WriteString(output)
+	// Write the result to the specified output.
+	WriteGraph(tfGraph, dependencies)
 }
