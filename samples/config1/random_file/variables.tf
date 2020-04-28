@@ -1,4 +1,4 @@
 variable "file_prefix" {
-  type = string
+  type        = string
   description = "File prefix"
 }

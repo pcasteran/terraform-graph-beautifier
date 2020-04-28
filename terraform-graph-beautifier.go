@@ -4,16 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/awalterschulze/gographviz"
-	tfgraph "github.com/pcasteran/terraform-graph-beautifier/tfgraph"
+	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
-	"regexp"
-	"strings"
 )
-
-var /* const */ tfResourceRegexp = regexp.MustCompile(`^"root.(.*)"$`)
-var /* const */ tfModuleRegexp = regexp.MustCompile(`module\.(.*?)\.(.*)`)
 
 func main() {
 	// Parse command line arguments.
@@ -35,46 +30,8 @@ func main() {
 	// Load the graph from the specified input.
 	graphIn := loadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
-	// Reconstruct the Terraform resources hierarchy.
-	root := tfgraph.NewModule(nil, "root")
-	for _, node := range graphIn.Nodes.Nodes {
-		// Check node name.
-		if !tfResourceRegexp.MatchString(node.Name) {
-			log.Fatal().
-				Str("name", node.Name).
-				Msg("Invalid node name")
-		}
-
-		// Get the TF resource qualified name from the 'label' attribute
-		// and find its parent module sub-graph(es).
-		resourceQualifiedName := strings.ReplaceAll(node.Attrs[gographviz.Label], "\"", "")
-		module := root
-		for {
-			// Check if the current qualified name (still) starts with a module reference.
-			matches := tfModuleRegexp.FindStringSubmatch(resourceQualifiedName)
-			if matches == nil {
-				// Ok, all modules were stripped from the qualified name
-				// and the `module` variable is the resource parent.
-				break
-			}
-
-			moduleName := matches[1]
-			childModule, ok := module.Children[moduleName].(*tfgraph.Module)
-			if !ok {
-				childModule = tfgraph.NewModule(module, moduleName)
-				module.Children[moduleName] = childModule
-			}
-			module = childModule
-			resourceQualifiedName = matches[2]
-		}
-
-		// Add a resource node to the current module.
-		// TODO
-		module.AddChild(&tfgraph.AbstractConfigurationComponent{
-			Parent: nil,
-			Name:   resourceQualifiedName,
-		})
-	}
+	// Build the Terraform resource graph.
+	_= /*tfGraph :=*/ tfgraph.BuildTfGraphFromGraphviz(graphIn)
 
 	// Build the output Graphviz graph.
 	graphOut := gographviz.NewGraph()

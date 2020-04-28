@@ -15,16 +15,16 @@ type replaceStruct struct {
 }
 
 var /* const */ tfOutputFixes = map[*regexp.Regexp]replaceStruct{
-	// Replace : `"[root] rsc_type.rsc_name"` => `"root.rsc_type.rsc_name"`
-	regexp.MustCompile(`"\[root] `): replaceStruct{`"root.`, false},
+	// Replace : `"[root] rsc_type.rsc_name"` => `"module.root.rsc_type.rsc_name"`
+	regexp.MustCompile(`"\[root] `): replaceStruct{`"module.root.`, false},
 	// Replace : map["foo"] => map['foo']
 	regexp.MustCompile(`\["(.*?)"]`): replaceStruct{"['${1}']", true},
 }
 
 var /* const */ tfJunkMatches = []*regexp.Regexp{
-	regexp.MustCompile(`"root.root"`),
-	regexp.MustCompile(`"root.meta.count-boundary \(EachMode fixup\)"`),
-	regexp.MustCompile(`"root.provider\..* \(close\)"`),
+	regexp.MustCompile(`"module.root.root"`),
+	regexp.MustCompile(`"module.root.meta.count-boundary \(EachMode fixup\)"`),
+	regexp.MustCompile(`"module.root.provider\..* \(close\)"`),
 }
 
 func loadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {

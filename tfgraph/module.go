@@ -1,23 +1,22 @@
 package tfgraph
 
 type Module struct {
-	// Embed AbstractConfigurationComponent.
-	*AbstractConfigurationComponent
+	*BaseConfigElement
 
-	Children map[string]ConfigurationComponent
+	Children map[string]ConfigElement
 }
 
 func NewModule(parent *Module, name string) *Module {
 	return &Module{
-		AbstractConfigurationComponent: &AbstractConfigurationComponent{
-			Parent: parent,
-			Name:   name,
+		BaseConfigElement: &BaseConfigElement{
+			parent: parent,
+			name:   name,
+			tfType: TfModule,
 		},
-		Children: make(map[string]ConfigurationComponent),
+		Children: make(map[string]ConfigElement),
 	}
 }
 
-func (m *Module) AddChild(c *AbstractConfigurationComponent) {
-	c.Parent = m
-	m.Children[c.Name] = c
+func (m *Module) AddChild(e ConfigElement) {
+	m.Children[e.GetName()] = e
 }

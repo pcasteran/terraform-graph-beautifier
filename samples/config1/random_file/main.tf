@@ -12,6 +12,10 @@ resource "time_static" "creation_time" {
 }
 
 resource "local_file" "file" {
-  content = random_string.content.result
-  filename = "generated/${time_static.creation_time.triggers.file_prefix}-${time_static.creation_time.rfc3339}.txt"
+  content  = random_string.content.result
+  filename = "artifacts/${time_static.creation_time.triggers.file_prefix}-${time_static.creation_time.rfc3339}.txt"
+}
+
+module "noop" {
+  source = "../noop"
 }

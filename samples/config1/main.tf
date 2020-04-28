@@ -1,7 +1,4 @@
-resource "null_resource" "noop" {
-}
-
-module "file_1" {
-  source = "./random_file"
+module "random_file" {
+  source      = "./random_file"
   file_prefix = "foo"
 }
