@@ -28,10 +28,10 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Load the graph from the specified input.
-	graphIn := loadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
+	graphIn := LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
 	// Build the Terraform resource graph.
-	_= /*tfGraph :=*/ tfgraph.BuildTfGraphFromGraphviz(graphIn)
+	_, _ = /*tfGraph :=*/ tfgraph.BuildTfGraphFromGraphviz(graphIn)
 
 	// Build the output Graphviz graph.
 	graphOut := gographviz.NewGraph()

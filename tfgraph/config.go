@@ -1,6 +1,8 @@
 package tfgraph
 
-import "regexp"
+import (
+	"regexp"
+)
 
 const (
 	TfResource = "resource"
@@ -61,4 +63,19 @@ func (e *BaseConfigElement) GetQualifiedName() string {
 
 func (e *BaseConfigElement) GetTfType() string {
 	return e.tfType
+}
+
+type Dependency struct {
+	// This element depends on the `dst` element.
+	src ConfigElement
+
+	// This element is a dependency of the `src` element.
+	dst ConfigElement
+}
+
+func NewDependency(src ConfigElement, dst ConfigElement) *Dependency {
+	return &Dependency{
+		src: src,
+		dst: dst,
+	}
 }

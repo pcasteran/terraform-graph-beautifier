@@ -7,9 +7,10 @@ import (
 )
 
 // Builds the Terraform configuration element hierarchy from the specified Graphviz graph.
-func BuildTfGraphFromGraphviz(graph *gographviz.Graph) *Module {
-	// Create the root module.
+func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) {
+	// Create the graph root and build the graph from here.
 	tfGraphRoot := NewModule(nil, "")
+	nodeNameToConfigElement := make(map[string]ConfigElement, len(graph.Nodes.Nodes))
 	for _, node := range graph.Nodes.Nodes {
 		// Check the node name.
 		if !tfConfigElementRegexp.MatchString(node.Name) {
@@ -51,10 +52,29 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) *Module {
 		}
 		elt := NewBaseConfigElement(module, qualifiedName, tfType)
 		module.AddChild(elt)
-
-		// TODO : edges
+		nodeNameToConfigElement[node.Name] = elt
 	}
 
-	// Return the "root" module.
-	return tfGraphRoot.Children["root"].(*Module)
+	// Build the edges of the graph.
+	var edges []*Dependency
+	for _, edge := range graph.Edges.Edges {
+		src, ok := nodeNameToConfigElement[edge.Src]
+		if !ok {
+			log.Fatal().
+				Str("source", edge.Src).
+				Msg("Edge source is referencing an invalid node")
+		}
+
+		dst, ok := nodeNameToConfigElement[edge.Dst]
+		if !ok {
+			log.Fatal().
+				Str("destination", edge.Dst).
+				Msg("Edge destination is referencing an invalid node")
+		}
+
+		edges = append(edges, &Dependency{src: src, dst: dst})
+	}
+
+	// Return the "root" module and the edges.
+	return tfGraphRoot.Children["root"].(*Module), edges
 }
