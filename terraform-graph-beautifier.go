@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/awalterschulze/gographviz"
-	tfgraph "github.com/pcasteran/terraform-graph-beautifier/tf-graph"
+	tfgraph "github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -85,7 +85,7 @@ func main() {
 	output := graphIn.String()
 	fmt.Println(output)
 
-	fo, err := os.Create("output.gv")
+	fo, err := os.Create("samples/output.gv")
 	if err != nil {
 		panic(err)
 	}

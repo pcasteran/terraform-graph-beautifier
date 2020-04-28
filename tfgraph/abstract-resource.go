@@ -1,11 +1,16 @@
 package tfgraph
 
+// TODO : rename ConfigElement
 type ConfigurationComponent interface {
+	// TODO : à virer ?
 	GetQualifiedName() string
 }
 
 type AbstractConfigurationComponent struct {
-	ConfigurationComponent
+	// TODO : utile ?
+	//ConfigurationComponent
+
+	// TODO : à virer ?
 	Parent *Module
 	Name   string
 }

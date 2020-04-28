@@ -15,3 +15,5 @@
 # vendor/
 
 .idea/
+
+/terraform-graph-beautifier
