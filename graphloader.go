@@ -9,18 +9,34 @@ import (
 	"strings"
 )
 
-var /* const */ tfOutputFixes = map[*regexp.Regexp]string{
+type replaceStruct struct {
+	replacePattern string
+	report         bool
+}
+
+var /* const */ tfOutputFixes = map[*regexp.Regexp]replaceStruct{
+	// Replace : `"[root] rsc_type.rsc_name"` => `"root.rsc_type.rsc_name"`
+	regexp.MustCompile(`"\[root] `): replaceStruct{`"root.`, false},
 	// Replace : map["foo"] => map['foo']
-	regexp.MustCompile(`\["(.*?)"]`): "['${1}']",
+	regexp.MustCompile(`\["(.*?)"]`): replaceStruct{"['${1}']", true},
 }
 
 var /* const */ tfJunkMatches = []*regexp.Regexp{
-	regexp.MustCompile(`"\[root] root"`),
-	regexp.MustCompile(`"\[root] meta.count-boundary \(EachMode fixup\)"`),
-	regexp.MustCompile(`"\[root] provider\..* \(close\)"`),
+	regexp.MustCompile(`"root.root"`),
+	regexp.MustCompile(`"root.meta.count-boundary \(EachMode fixup\)"`),
+	regexp.MustCompile(`"root.provider\..* \(close\)"`),
 }
 
 func loadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
+	// Build all the patterns to exclude.
+	var exclusionPatterns []*regexp.Regexp
+	if !keepTfJunk {
+		exclusionPatterns = append(exclusionPatterns, tfJunkMatches...)
+	}
+	for _, pattern := range excludePatterns {
+		exclusionPatterns = append(exclusionPatterns, regexp.MustCompile(pattern))
+	}
+
 	// Get the file to use.
 	var file *os.File
 	var err error
@@ -37,29 +53,33 @@ func loadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) 
 		defer file.Close()
 	}
 
-	// Build all the patterns to exclude.
-	var exclusionPatterns []*regexp.Regexp
-	if !keepTfJunk {
-		exclusionPatterns = append(exclusionPatterns, tfJunkMatches...)
-	}
-	for _, pattern := range excludePatterns {
-		exclusionPatterns = append(exclusionPatterns, regexp.MustCompile(pattern))
-	}
-
 	// Read the input line by line.
 	scanner := bufio.NewScanner(file)
 	var sb strings.Builder
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.TrimSpace(scanner.Text())
+
+		// Fix some issues with the Terraform output.
+		for matchPattern, replaceStruct := range tfOutputFixes {
+			previous := line
+			line = matchPattern.ReplaceAllString(line, replaceStruct.replacePattern)
+			if line != previous && replaceStruct.report {
+				log.
+					Debug().
+					Str("before", previous).
+					Str("after", line).
+					Msg("Line fixed")
+			}
+		}
 
 		// Check if the line has to be excluded.
 		exclude := false
-		for _, match := range exclusionPatterns {
-			if match.MatchString(line) {
+		for _, matchPattern := range exclusionPatterns {
+			if matchPattern.MatchString(line) {
 				log.
 					Debug().
 					Str("line", line).
-					Str("pattern", match.String()).
+					Str("pattern", matchPattern.String()).
 					Msg("Line filtered out")
 				exclude = true
 				break
@@ -67,19 +87,6 @@ func loadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) 
 		}
 		if exclude {
 			continue
-		}
-
-		// Fix some issues with the Terraform output.
-		for match, replace := range tfOutputFixes {
-			lineFixed := match.ReplaceAllString(line, replace)
-			if line != lineFixed {
-				log.
-					Debug().
-					Str("before", line).
-					Str("after", lineFixed).
-					Msg("Line fixed")
-				line = lineFixed
-			}
 		}
 
 		sb.WriteString(line + "\n")

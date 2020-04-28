@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-var /* const */ tfResourceRegexp = regexp.MustCompile(`^"\[root] (.*)"$`)
+var /* const */ tfResourceRegexp = regexp.MustCompile(`^"root.(.*)"$`)
 var /* const */ tfModuleRegexp = regexp.MustCompile(`module\.(.*?)\.(.*)`)
 
 func main() {
