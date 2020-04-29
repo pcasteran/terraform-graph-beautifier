@@ -19,12 +19,14 @@ func WriteGraph(outputFilePath string, root *tfgraph.Module, dependencies []*tfg
 
 	// Add the edges.
 	for _, dep := range dependencies {
+		shape, style := getEdgeShapeAndStyle(dep)
 		_ = graph.AddEdge(
 			escape(dep.Src.GetQualifiedName()),
 			escape(dep.Dst.GetQualifiedName()),
 			true,
 			map[string]string{
-				// TODO
+				string(gographviz.Shape): escape(shape),
+				string(gographviz.Style): escape(style),
 			},
 		)
 	}
@@ -53,6 +55,7 @@ func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.M
 		clusterName,
 		map[string]string{
 			string(gographviz.Label): escape(module.GetName()),
+			string(gographviz.Style): escape("dashed"),
 		},
 	)
 
@@ -64,12 +67,14 @@ func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.M
 			createCluster(graph, clusterName, subModule)
 		} else {
 			// No, add the config element to the current cluster.
+			shape, style := getNodeShapeAndStyle(child)
 			_ = graph.AddNode(
 				clusterName,
 				escape(child.GetQualifiedName()),
 				map[string]string{
 					string(gographviz.Label): escape(child.GetName()),
-					// TODO
+					string(gographviz.Shape): escape(shape),
+					string(gographviz.Style): escape(style),
 				},
 			)
 		}
@@ -78,4 +83,43 @@ func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.M
 
 func escape(s string) string {
 	return "\"" + s + "\""
+}
+
+func getNodeShapeAndStyle(elt tfgraph.ConfigElement) (string, string) {
+	shape := ""
+	style := ""
+	switch elt.GetTfType() {
+	case tfgraph.TfResource:
+		shape = "box"
+		style = "rounded"
+	case tfgraph.TfVar:
+		shape = "ellipse"
+	case tfgraph.TfLocal:
+		shape = "ellipse"
+	case tfgraph.TfOutput:
+		shape = "note"
+	case tfgraph.TfProvider:
+		shape = "diamond"
+	}
+
+	return shape, style
+}
+
+func getEdgeShapeAndStyle(dep *tfgraph.Dependency) (string, string) {
+	shape := ""
+	style := ""
+	switch dep.Dst.GetTfType() {
+	case tfgraph.TfResource:
+		style = "solid"
+	case tfgraph.TfVar:
+		style = "dotted"
+	case tfgraph.TfLocal:
+		style = "dotted"
+	case tfgraph.TfOutput:
+		style = "dashed"
+	case tfgraph.TfProvider:
+		style = "solid"
+	}
+
+	return shape, style
 }

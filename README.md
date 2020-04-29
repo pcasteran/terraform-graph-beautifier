@@ -38,6 +38,7 @@ tf-types:
         - a configuration file (can be checked-in alongside your Terraform configuration)
         - command line arguments
         if both are used, command line arguments take precedence : check if some params can be merged
+    - Refer to the Graphviz [documentation](https://www.graphviz.org/doc/info/) for available [shapes](https://www.graphviz.org/doc/info/shapes.html) and [styles](https://www.graphviz.org/doc/info/attrs.html#k:style).        
 - Github:
     - actions to build
     - issues Github plutot que TODO
