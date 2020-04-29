@@ -7,11 +7,12 @@ import (
 	"os"
 )
 
-func WriteGraph(root *tfgraph.Module, dependencies []*tfgraph.Dependency) {
+func WriteGraph(root *tfgraph.Module, dependencies []*tfgraph.Dependency, graphName string) {
 	// Build the output Graphviz graph.
 	graph := gographviz.NewGraph()
-	graph.Name = "" // TODO : name or current directory
+	graph.Name = graphName
 	graph.Directed = true
+	graph.AddAttr(graph.Name, string(gographviz.NewRank), "true")
 
 	// Add all the modules as clusters.
 	createCluster(graph, "", root)

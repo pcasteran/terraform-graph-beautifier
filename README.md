@@ -30,15 +30,16 @@ tf-types:
     - fg-colors: [...]
     - arrow-to-shape: ""
 ```
-- Param pour générer un fichier de config avec valeurs par défaut. 
-- Customs attributes
-    - tf-type
-- Voir (orphan), (close) (removed)
-- Exemples utilisation [`sfdp`](https://linux.die.net/man/1/sfdp)
-- Github actions to build
-- compound="true"; newrank="true";
-- 2 ways to configure the command execution:
-    - a configuration file (can be checked-in alongside your Terraform configuration)
-    - command line arguments
-    if both are used, command line arguments take precedence : check if some params can be merged
 - output param
+- Exemples utilisation [`sfdp`](https://linux.die.net/man/1/sfdp)
+- Voir (orphan), (close) (removed)
+- config file
+    - Param pour générer un fichier de config avec valeurs par défaut. 
+    - 2 ways to configure the command execution:
+        - a configuration file (can be checked-in alongside your Terraform configuration)
+        - command line arguments
+        if both are used, command line arguments take precedence : check if some params can be merged
+- Github:
+    - actions to build
+    - issues Github plutot que TODO
+    - protéger master
