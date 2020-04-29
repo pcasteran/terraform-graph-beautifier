@@ -1,25 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"github.com/awalterschulze/gographviz"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
+	"github.com/rs/zerolog/log"
 	"os"
 )
 
-func WriteGraph(root *tfgraph.Module, dependencies []*tfgraph.Dependency, graphName string) {
+func WriteGraph(outputFilePath string, root *tfgraph.Module, dependencies []*tfgraph.Dependency, graphName string) {
 	// Build the output Graphviz graph.
 	graph := gographviz.NewGraph()
-	graph.Name = graphName
+	graph.Name = escape(graphName)
 	graph.Directed = true
 	graph.AddAttr(graph.Name, string(gographviz.NewRank), "true")
 
 	// Add all the modules as clusters.
-	createCluster(graph, "", root)
+	createCluster(graph, graph.Name, root)
 
 	// Add the edges.
 	for _, dep := range dependencies {
-		graph.AddEdge(
+		_ = graph.AddEdge(
 			escape(dep.Src.GetQualifiedName()),
 			escape(dep.Dst.GetQualifiedName()),
 			true,
@@ -29,31 +29,30 @@ func WriteGraph(root *tfgraph.Module, dependencies []*tfgraph.Dependency, graphN
 		)
 	}
 
+	// Get the file to use.
+	file := os.Stdout
+	var err error
+	if outputFilePath != "" {
+		// Write to the specified file.
+		file, err = os.Create(outputFilePath)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Cannot open the specified file for writing")
+		}
+		defer file.Close()
+	}
+
 	// Output the result.
 	output := graph.String()
-	fmt.Println(output)
-
-	// TODO : temp for tests
-	fo, err := os.Create("samples/output.gv")
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err := fo.Close(); err != nil {
-			panic(err)
-		}
-	}()
-	_, _ = fo.WriteString(output)
+	_, _ = file.WriteString(output)
 }
 
 func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.Module) {
 	clusterName := escape("cluster_" + module.GetQualifiedName())
-	graph.AddSubGraph(
+	_ = graph.AddSubGraph(
 		parentName,
 		clusterName,
 		map[string]string{
 			string(gographviz.Label): escape(module.GetName()),
-			// TODO
 		},
 	)
 
@@ -65,7 +64,7 @@ func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.M
 			createCluster(graph, clusterName, subModule)
 		} else {
 			// No, add the config element to the current cluster.
-			graph.AddNode(
+			_ = graph.AddNode(
 				clusterName,
 				escape(child.GetQualifiedName()),
 				map[string]string{

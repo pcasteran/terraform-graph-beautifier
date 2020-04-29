@@ -30,7 +30,6 @@ tf-types:
     - fg-colors: [...]
     - arrow-to-shape: ""
 ```
-- output param
 - Exemples utilisation [`sfdp`](https://linux.die.net/man/1/sfdp)
 - Voir (orphan), (close) (removed)
 - config file

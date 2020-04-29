@@ -38,17 +38,13 @@ func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) 
 	}
 
 	// Get the file to use.
-	var file *os.File
+	file := os.Stdin
 	var err error
-	if inputFilePath == "" {
-		// Read from stdin.
-		file = os.Stdin
-		err = nil
-	} else {
-		// Read from input file.
+	if inputFilePath != "" {
+		// Read from the specified file.
 		file, err = os.Open(inputFilePath)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Cannot open specified file")
+			log.Fatal().Err(err).Msg("Cannot open the specified file for reading")
 		}
 		defer file.Close()
 	}
