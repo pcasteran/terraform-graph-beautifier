@@ -42,4 +42,3 @@ tf-types:
     - command line arguments
     if both are used, command line arguments take precedence : check if some params can be merged
 - output param
-- leading "." on GetQualifiedName()

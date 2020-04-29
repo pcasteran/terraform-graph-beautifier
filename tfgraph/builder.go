@@ -76,5 +76,7 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 	}
 
 	// Return the "root" module and the edges.
-	return tfGraphRoot.Children["root"].(*Module), edges
+	root := tfGraphRoot.Children["module.root"].(*Module)
+	root.parent = nil
+	return root, edges
 }

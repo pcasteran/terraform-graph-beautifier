@@ -14,6 +14,7 @@ const (
 )
 
 // Set of all managed TF types.
+// TODO : utile ?
 type void struct{}
 
 var empty void
@@ -27,7 +28,7 @@ var /* const */ ManagedTerraformTypes = map[string]void{
 }
 
 var /* const */ tfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
-var /* const */ tfModuleRegexp = regexp.MustCompile(`module\.(.*?)\.(.*)`)
+var /* const */ tfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
 
 type ConfigElement interface {
 	GetName() string

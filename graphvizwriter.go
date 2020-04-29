@@ -70,7 +70,6 @@ func createCluster(graph *gographviz.Graph, parentName string, module *tfgraph.M
 				map[string]string{
 					string(gographviz.Label): escape(child.GetName()),
 					// TODO
-					// TODO custom TF type ? NewAttr()
 				},
 			)
 		}
