@@ -31,6 +31,7 @@ var /* const */ tfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$
 var /* const */ tfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
 
 type ConfigElement interface {
+	GetParent() *Module
 	GetName() string
 	GetQualifiedName() string
 	GetTfType() string
@@ -48,6 +49,10 @@ func NewBaseConfigElement(parent *Module, name string, tfType string) *BaseConfi
 		name:   name,
 		tfType: tfType,
 	}
+}
+
+func (e *BaseConfigElement) GetParent() *Module {
+	return e.parent
 }
 
 func (e *BaseConfigElement) GetName() string {

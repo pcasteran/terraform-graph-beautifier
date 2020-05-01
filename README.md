@@ -48,3 +48,5 @@ tf-types:
     - issues Github plutot que TODO
     - protéger master
 - Tester mode : module nesting ou referencing (compound)
+- neato -Goverlap=false (-Gmodel=subset)
+- voir doc splines=ortho et overlap;
