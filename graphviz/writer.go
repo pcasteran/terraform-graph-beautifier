@@ -1,4 +1,4 @@
-package main
+package graphviz
 
 import (
 	"github.com/awalterschulze/gographviz"

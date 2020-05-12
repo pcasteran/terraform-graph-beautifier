@@ -1,19 +1,30 @@
-package tfgraph
+package graphviz
 
 import (
 	"github.com/awalterschulze/gographviz"
+	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
 	"strings"
 )
 
+func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) (*tfgraph.Module, []*tfgraph.Dependency) {
+	// Load the graph from the specified input.
+	graphIn := readGraph(inputFilePath, keepTfJunk, excludePatterns)
+
+	// Build the Terraform resource graph.
+	tfGraph, dependencies := buildTfGraph(graphIn)
+
+	return tfGraph, dependencies
+}
+
 // Builds the Terraform configuration element hierarchy from the specified Graphviz graph.
-func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) {
+func buildTfGraph(graph *gographviz.Graph) (*tfgraph.Module, []*tfgraph.Dependency) {
 	// Create the graph root and build the graph from here.
-	tfGraphRoot := NewModule(nil, "")
-	nodeNameToConfigElement := make(map[string]ConfigElement, len(graph.Nodes.Nodes))
+	tfGraphRoot := tfgraph.NewModule(nil, "")
+	nodeNameToConfigElement := make(map[string]tfgraph.ConfigElement, len(graph.Nodes.Nodes))
 	for _, node := range graph.Nodes.Nodes {
 		// Check the node name.
-		if !tfConfigElementRegexp.MatchString(node.Name) {
+		if !tfgraph.TfConfigElementRegexp.MatchString(node.Name) {
 			log.Fatal().
 				Str("name", node.Name).
 				Msg("Invalid node name")
@@ -24,7 +35,7 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 		module := tfGraphRoot
 		for {
 			// Check if the current qualified name starts with a module reference.
-			matches := tfModuleRegexp.FindStringSubmatch(qualifiedName)
+			matches := tfgraph.TfModuleRegexp.FindStringSubmatch(qualifiedName)
 			if matches == nil {
 				// Ok, all modules were stripped from the qualified name
 				// and the `module` variable is the config element parent.
@@ -32,10 +43,10 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 			}
 
 			moduleName := matches[1]
-			childModule, ok := module.Children[moduleName].(*Module)
+			childModule, ok := module.Children[moduleName].(*tfgraph.Module)
 			if !ok {
 				// First time we see this module name, create a new module element.
-				childModule = NewModule(module, moduleName)
+				childModule = tfgraph.NewModule(module, moduleName)
 				module.Children[moduleName] = childModule
 			}
 			module = childModule
@@ -43,20 +54,20 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 		}
 
 		// Add a new config element node to the current module.
-		tfType := TfResource
-		for managedTfType := range ManagedTerraformTypes {
+		tfType := tfgraph.TfResource
+		for managedTfType := range tfgraph.ManagedTerraformTypes {
 			if strings.HasPrefix(qualifiedName, managedTfType+".") {
 				tfType = managedTfType
 				break
 			}
 		}
-		elt := NewBaseConfigElement(module, qualifiedName, tfType)
+		elt := tfgraph.NewBaseConfigElement(module, qualifiedName, tfType)
 		module.AddChild(elt)
 		nodeNameToConfigElement[node.Name] = elt
 	}
 
 	// Build the edges of the graph.
-	var edges []*Dependency
+	var edges []*tfgraph.Dependency
 	for _, edge := range graph.Edges.Edges {
 		src, ok := nodeNameToConfigElement[edge.Src]
 		if !ok {
@@ -72,11 +83,11 @@ func BuildTfGraphFromGraphviz(graph *gographviz.Graph) (*Module, []*Dependency) 
 				Msg("Edge destination is referencing an invalid node")
 		}
 
-		edges = append(edges, &Dependency{Src: src, Dst: dst})
+		edges = append(edges, &tfgraph.Dependency{Src: src, Dst: dst})
 	}
 
 	// Return the "root" module and the edges.
-	root := tfGraphRoot.Children["module.root"].(*Module)
-	root.parent = nil
+	root := tfGraphRoot.Children["module.root"].(*tfgraph.Module)
+	root.SetParent(nil)
 	return root, edges
 }

@@ -1,4 +1,4 @@
-package main
+package cytoscape
 
 type NodeData struct {
 	Id     string `json:"id"`

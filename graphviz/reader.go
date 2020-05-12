@@ -1,4 +1,4 @@
-package main
+package graphviz
 
 import (
 	"bufio"
@@ -27,7 +27,7 @@ var /* const */ tfJunkMatches = []*regexp.Regexp{
 	regexp.MustCompile(`"module.root.provider\..* \(close\)"`),
 }
 
-func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
+func readGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
 	// Build all the patterns to exclude.
 	var exclusionPatterns []*regexp.Regexp
 	if !keepTfJunk {

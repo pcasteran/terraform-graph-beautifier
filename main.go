@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
+	"github.com/pcasteran/terraform-graph-beautifier/cytoscape"
+	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -46,14 +47,12 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Load the graph from the specified input.
-	graphIn := LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
-
-	// Build the Terraform resource graph.
-	tfGraph, dependencies := tfgraph.BuildTfGraphFromGraphviz(graphIn)
+	tfGraph, dependencies := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
 	// Write the result to the specified output.
-	formattingOptions := &FormattingOptions{
+	// TODO : output type
+	formattingOptions := &cytoscape.FormattingOptions{
 		EmbedModules: *embedModules,
 	}
-	WriteGraph(*outputFilePath, tfGraph, dependencies, *graphName, formattingOptions)
+	cytoscape.WriteGraph(*outputFilePath, tfGraph, dependencies, *graphName, formattingOptions)
 }

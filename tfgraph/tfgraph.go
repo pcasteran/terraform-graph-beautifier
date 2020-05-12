@@ -14,7 +14,6 @@ const (
 )
 
 // Set of all managed TF types.
-// TODO : utile ?
 type void struct{}
 
 var empty void
@@ -27,11 +26,12 @@ var /* const */ ManagedTerraformTypes = map[string]void{
 	TfProvider: empty,
 }
 
-var /* const */ tfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
-var /* const */ tfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
+var /* const */ TfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
+var /* const */ TfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
 
 type ConfigElement interface {
 	GetParent() *Module
+	SetParent(parent *Module)
 	GetName() string
 	GetQualifiedName() string
 	GetTfType() string
@@ -55,6 +55,10 @@ func (e *BaseConfigElement) GetParent() *Module {
 	return e.parent
 }
 
+func (e *BaseConfigElement) SetParent(parent *Module) {
+	e.parent = parent
+}
+
 func (e *BaseConfigElement) GetName() string {
 	return e.name
 }
@@ -69,6 +73,27 @@ func (e *BaseConfigElement) GetQualifiedName() string {
 
 func (e *BaseConfigElement) GetTfType() string {
 	return e.tfType
+}
+
+type Module struct {
+	*BaseConfigElement
+
+	Children map[string]ConfigElement
+}
+
+func NewModule(parent *Module, name string) *Module {
+	return &Module{
+		BaseConfigElement: &BaseConfigElement{
+			parent: parent,
+			name:   name,
+			tfType: TfModule,
+		},
+		Children: make(map[string]ConfigElement),
+	}
+}
+
+func (m *Module) AddChild(e ConfigElement) {
+	m.Children[e.GetName()] = e
 }
 
 type Dependency struct {
