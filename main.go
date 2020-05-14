@@ -52,7 +52,8 @@ func main() {
 	// Write the result to the specified output.
 	// TODO : output type
 	formattingOptions := &cytoscape.FormattingOptions{
+		GraphName:    *graphName,
 		EmbedModules: *embedModules,
 	}
-	cytoscape.WriteGraph(*outputFilePath, tfGraph, dependencies, *graphName, formattingOptions)
+	cytoscape.WriteGraph(*outputFilePath, tfGraph, dependencies, formattingOptions)
 }
