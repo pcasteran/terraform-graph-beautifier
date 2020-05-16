@@ -2,12 +2,19 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/pcasteran/terraform-graph-beautifier/cytoscape"
 	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
+)
+
+const (
+	outputTypeCytoscapeJson = "cyto-json"
+	outputTypeCytoscapeHtml = "cyto-html"
+	outputTypeGraphivz      = "graphviz"
 )
 
 func getWorkingDir() string {
@@ -21,6 +28,7 @@ func getWorkingDir() string {
 func main() {
 	// Prepare command line options.
 	inputFilePath := flag.String("input", "", "Path of the input Graphviz file to read, if not set 'stdin' is used")
+	outputType := flag.String("output-type", "", fmt.Sprintf("Type of output, can be one the following : %s (default), %s, %s", outputTypeCytoscapeJson, outputTypeCytoscapeHtml, outputTypeGraphivz))
 	outputFilePath := flag.String("output", "", "Path of the output Graphviz file to write, if not set 'stdout' is used")
 	debug := flag.Bool("debug", false, "Prints debugging information to stderr")
 	// Input reading options.
@@ -47,13 +55,42 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Load the graph from the specified input.
-	tfGraph, dependencies := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
+	// TODO : type Graph
+	root, dependencies := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
 	// Write the result to the specified output.
-	// TODO : output type
-	formattingOptions := &cytoscape.FormattingOptions{
-		GraphName:    *graphName,
-		EmbedModules: *embedModules,
+	outputFile := os.Stdout
+	var err error
+	if *outputFilePath != "" {
+		// Write to the specified file.
+		outputFile, err = os.Create(*outputFilePath)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Cannot open the specified file for writing")
+		}
+		defer func() {
+			if err := outputFile.Close(); err != nil {
+				log.Fatal().Err(err).Msg("Cannot close the specified after writing")
+			}
+		}()
 	}
-	cytoscape.WriteGraph(*outputFilePath, tfGraph, dependencies, formattingOptions)
+
+	switch *outputType {
+	case "", outputTypeCytoscapeJson:
+		log.Debug().Msg("Outputting graph data to Cytoscape.js JSON format")
+		cytoscape.WriteGraphJson(outputFile, root, dependencies)
+	case outputTypeCytoscapeHtml:
+		log.Debug().Msg("Outputting graph data to Cytoscape.js HTML format")
+		cytoscape.WriteGraphHtml(outputFile, root, dependencies, &cytoscape.FormattingOptions{
+			GraphName:    *graphName,
+			EmbedModules: *embedModules,
+		})
+	case outputTypeGraphivz:
+		log.Debug().Msg("Outputting graph data to Graphviz Dot format")
+		graphviz.WriteGraph(outputFile, root, dependencies, &graphviz.FormattingOptions{
+			GraphName:    *graphName,
+			EmbedModules: *embedModules,
+		})
+	default:
+		log.Fatal().Err(err).Msg(fmt.Sprintf("Invalid output type : %s", *outputType))
+	}
 }

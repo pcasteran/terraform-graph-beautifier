@@ -48,7 +48,4 @@ tf-types:
     - issues Github plutot que TODO
     - protéger master
 - Tester mode : module nesting ou referencing (compound)
-- A choisir
-    - output : json (default) / html (si template founit)
-    - output json et fournir html qui l'utilise (mieux mais plus beautifier...)
-    - type: cytoscape-json / cytoscape-html
+- Makefile

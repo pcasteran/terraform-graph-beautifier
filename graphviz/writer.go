@@ -3,26 +3,25 @@ package graphviz
 import (
 	"github.com/awalterschulze/gographviz"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
-	"github.com/rs/zerolog/log"
-	"os"
+	"io"
 )
 
 const clusterRefNodeName = "clusterRef"
 
 type FormattingOptions struct {
+	GraphName    string
 	EmbedModules bool
 }
 
 func WriteGraph(
-	outputFilePath string,
+	writer io.Writer,
 	root *tfgraph.Module,
 	dependencies []*tfgraph.Dependency,
-	graphName string,
 	formattingOptions *FormattingOptions,
 ) {
 	// Build the output Graphviz graph.
 	graph := gographviz.NewGraph()
-	graph.Name = escape(graphName)
+	graph.Name = escape(formattingOptions.GraphName)
 	graph.Directed = true
 	_ = graph.AddAttr(graph.Name, string(gographviz.NewRank), "true")
 	_ = graph.AddAttr(graph.Name, string(gographviz.Compound), "true")
@@ -45,25 +44,9 @@ func WriteGraph(
 		)
 	}
 
-	// Get the file to use.
-	file := os.Stdout
-	var err error
-	if outputFilePath != "" {
-		// Write to the specified file.
-		file, err = os.Create(outputFilePath)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Cannot open the specified file for writing")
-		}
-		defer func() {
-			if err := file.Close(); err != nil {
-				log.Fatal().Err(err).Msg("Cannot close the specified after writing")
-			}
-		}()
-	}
-
 	// Output the result.
 	output := graph.String()
-	_, _ = file.WriteString(output)
+	io.WriteString(writer, output)
 }
 
 func createCluster(graph *gographviz.Graph, parentClusterName string, module *tfgraph.Module, formattingOptions *FormattingOptions) {

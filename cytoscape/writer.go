@@ -8,7 +8,7 @@ import (
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
 	"html/template"
-	"os"
+	"io"
 )
 
 type FormattingOptions struct {
@@ -16,28 +16,31 @@ type FormattingOptions struct {
 	EmbedModules bool // TODO
 }
 
-func WriteGraph(
-	outputFilePath string,
+func WriteGraphJson(writer io.Writer, root *tfgraph.Module, dependencies []*tfgraph.Dependency) {
+	// Get the graph elements.
+	graphElements := getGraphElements(root, dependencies)
+
+	// Encode the result to JSON.
+	enc := json.NewEncoder(writer)
+	if err := enc.Encode(&graphElements); err != nil {
+		log.Fatal().Err(err).Msg("Cannot encode Cytoscape.js graph to JSON")
+	}
+}
+
+func WriteGraphHtml(
+	writer io.Writer,
 	root *tfgraph.Module,
 	dependencies []*tfgraph.Dependency,
 	formattingOptions *FormattingOptions,
 ) {
-	// Get the Cytoscape graph elements.
-	graphElements := getGraphElements(root, dependencies, formattingOptions)
-
-	// Encode result to  JSON.
+	// Get the graph elements JSON.
 	var buf bytes.Buffer
-	graphW := bufio.NewWriter(&buf)
-	enc := json.NewEncoder(graphW)
-	if err := enc.Encode(&graphElements); err != nil {
-		log.Fatal().Err(err).Msg("Cannot encode Cytoscape graph buffer")
-	}
-	if err := graphW.Flush(); err != nil {
-		log.Fatal().Err(err).Msg("Cannot flush Cytoscape graph buffer")
-	}
+	graphWriter := bufio.NewWriter(&buf)
+	WriteGraphJson(graphWriter, root, dependencies)
 
+	// TODO : give template as parameter
 	tmpl := template.Must(template.ParseFiles("index.gohtml"))
-	err := tmpl.Execute(os.Stdout, &map[string]interface{}{
+	err := tmpl.Execute(writer, &map[string]interface{}{
 		"PageTitle":         formattingOptions.GraphName,
 		"GraphElementsJSON": template.JS(buf.String()),
 	})
@@ -46,11 +49,7 @@ func WriteGraph(
 	}
 }
 
-func getGraphElements(
-	root *tfgraph.Module,
-	dependencies []*tfgraph.Dependency,
-	formattingOptions *FormattingOptions,
-) *Elements {
+func getGraphElements(root *tfgraph.Module, dependencies []*tfgraph.Dependency) *Elements {
 	// Get the graph nodes.
 	var nodes []*Node
 	var addElement func(parent *tfgraph.Module, element tfgraph.ConfigElement)
@@ -94,7 +93,6 @@ func getGraphElements(
 		edges = append(edges, edge)
 	}
 
-	// Encode result to Cytoscape JSON.
 	return &Elements{
 		Nodes: nodes,
 		Edges: edges,
