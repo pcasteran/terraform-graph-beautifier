@@ -1,15 +1,19 @@
 package cytoscape
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
+	"github.com/rs/zerolog/log"
+	"html/template"
 	"os"
 )
 
 type FormattingOptions struct {
 	GraphName    string
-	EmbedModules bool
+	EmbedModules bool // TODO
 }
 
 func WriteGraph(
@@ -18,9 +22,36 @@ func WriteGraph(
 	dependencies []*tfgraph.Dependency,
 	formattingOptions *FormattingOptions,
 ) {
-	// TODO : use params
+	// Get the Cytoscape graph elements.
+	graphElements := getGraphElements(root, dependencies, formattingOptions)
 
-	// Add the nodes.
+	// Encode result to  JSON.
+	var buf bytes.Buffer
+	graphW := bufio.NewWriter(&buf)
+	enc := json.NewEncoder(graphW)
+	if err := enc.Encode(&graphElements); err != nil {
+		log.Fatal().Err(err).Msg("Cannot encode Cytoscape graph buffer")
+	}
+	if err := graphW.Flush(); err != nil {
+		log.Fatal().Err(err).Msg("Cannot flush Cytoscape graph buffer")
+	}
+
+	tmpl := template.Must(template.ParseFiles("index.gohtml"))
+	err := tmpl.Execute(os.Stdout, &map[string]interface{}{
+		"PageTitle":         formattingOptions.GraphName,
+		"GraphElementsJSON": template.JS(buf.String()),
+	})
+	if err != nil {
+		log.Fatal().Err(err).Msg("Cannot render HTML template")
+	}
+}
+
+func getGraphElements(
+	root *tfgraph.Module,
+	dependencies []*tfgraph.Dependency,
+	formattingOptions *FormattingOptions,
+) *Elements {
+	// Get the graph nodes.
 	var nodes []*Node
 	var addElement func(parent *tfgraph.Module, element tfgraph.ConfigElement)
 	addElement = func(parent *tfgraph.Module, element tfgraph.ConfigElement) {
@@ -48,7 +79,7 @@ func WriteGraph(
 	}
 	addElement(nil, root)
 
-	// Add the edges.
+	// Get the graph edges.
 	var edges []*Edge
 	for _, dep := range dependencies {
 		src := dep.Src.GetQualifiedName()
@@ -63,15 +94,9 @@ func WriteGraph(
 		edges = append(edges, edge)
 	}
 
-	// TODO : temp for test
-	elts := Elements{
+	// Encode result to Cytoscape JSON.
+	return &Elements{
 		Nodes: nodes,
 		Edges: edges,
-	}
-
-	enc := json.NewEncoder(os.Stdout)
-	//enc.SetIndent("", "  ")
-	if err := enc.Encode(&elts); err != nil {
-		// TODO
 	}
 }
