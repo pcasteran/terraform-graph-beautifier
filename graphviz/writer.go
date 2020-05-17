@@ -13,6 +13,7 @@ type FormattingOptions struct {
 	EmbedModules bool
 }
 
+// WriteGraph writes the specified Terraform graph in Graphviz Dot format.
 func WriteGraph(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
 	// Build the output Graphviz outputGraph.
 	outputGraph := gographviz.NewGraph()
@@ -29,8 +30,8 @@ func WriteGraph(writer io.Writer, graph *tfgraph.Graph, formattingOptions *Forma
 	for _, dep := range graph.Dependencies {
 		shape, style := getEdgeShapeAndStyle(dep)
 		_ = outputGraph.AddEdge(
-			escape(dep.Src.GetQualifiedName()),
-			escape(dep.Dst.GetQualifiedName()),
+			escape(dep.Source.GetQualifiedName()),
+			escape(dep.Destination.GetQualifiedName()),
 			true,
 			map[string]string{
 				string(gographviz.Shape): escape(shape),
@@ -145,7 +146,7 @@ func getNodeShapeAndStyle(elt tfgraph.ConfigElement) (string, string) {
 func getEdgeShapeAndStyle(dep *tfgraph.Dependency) (string, string) {
 	shape := ""
 	style := ""
-	switch dep.Dst.GetTfType() {
+	switch dep.Destination.GetTfType() {
 	case tfgraph.TfModule:
 		style = "solid"
 	case tfgraph.TfResource:

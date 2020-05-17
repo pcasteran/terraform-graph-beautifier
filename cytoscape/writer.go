@@ -16,7 +16,8 @@ type FormattingOptions struct {
 	EmbedModules bool // TODO
 }
 
-func WriteGraphJson(writer io.Writer, graph *tfgraph.Graph) {
+// WriteGraphJSON writes the specified Terraform graph in Cytoscape.js JSON format.
+func WriteGraphJSON(writer io.Writer, graph *tfgraph.Graph) {
 	// Get the graph elements.
 	graphElements := getGraphElements(graph)
 
@@ -27,11 +28,12 @@ func WriteGraphJson(writer io.Writer, graph *tfgraph.Graph) {
 	}
 }
 
-func WriteGraphHtml(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
+// WriteGraphHTML writes the specified Terraform graph to an HTML file using the given template.
+func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
 	// Get the graph elements JSON.
 	var buf bytes.Buffer
 	graphWriter := bufio.NewWriter(&buf)
-	WriteGraphJson(graphWriter, graph)
+	WriteGraphJSON(graphWriter, graph)
 
 	// TODO : give template as parameter
 	tmpl := template.Must(template.ParseFiles("index.gohtml"))
@@ -52,7 +54,7 @@ func getGraphElements(graph *tfgraph.Graph) *Elements {
 		// Add a node for the element.
 		node := &Node{
 			Data: NodeData{
-				Id:    element.GetQualifiedName(),
+				ID:    element.GetQualifiedName(),
 				Label: element.GetName(),
 			},
 			Classes: []string{element.GetTfType()},
@@ -76,11 +78,11 @@ func getGraphElements(graph *tfgraph.Graph) *Elements {
 	// Get the graph edges.
 	var edges []*Edge
 	for _, dep := range graph.Dependencies {
-		src := dep.Src.GetQualifiedName()
-		dst := dep.Dst.GetQualifiedName()
+		src := dep.Source.GetQualifiedName()
+		dst := dep.Destination.GetQualifiedName()
 		edge := &Edge{
 			Data: EdgeData{
-				Id:     fmt.Sprintf("%s -> %s", src, dst),
+				ID:     fmt.Sprintf("%s -> %s", src, dst),
 				Source: src,
 				Target: dst,
 			},

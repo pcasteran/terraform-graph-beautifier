@@ -4,6 +4,7 @@ import (
 	"regexp"
 )
 
+// List of the managed Terraform types.
 const (
 	TfResource = "resource"
 	TfVar      = "var"
@@ -13,17 +14,14 @@ const (
 	TfProvider = "provider"
 )
 
-// Set of all managed TF types.
-type void struct{}
-
-var empty void
-var /* const */ ManagedTerraformTypes = map[string]void{
-	TfResource: empty,
-	TfVar:      empty,
-	TfLocal:    empty,
-	TfOutput:   empty,
-	TfModule:   empty,
-	TfProvider: empty,
+// ManagedTerraformTypes is a set of all the managed Terraform types.
+var /* const */ ManagedTerraformTypes = map[string]interface{}{
+	TfResource: nil,
+	TfVar:      nil,
+	TfLocal:    nil,
+	TfOutput:   nil,
+	TfModule:   nil,
+	TfProvider: nil,
 }
 
 var /* const */ TfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
@@ -43,6 +41,7 @@ type BaseConfigElement struct {
 	tfType string
 }
 
+// NewBaseConfigElement creates a new module using the specified parent module, name and type.
 func NewBaseConfigElement(parent *Module, name string, tfType string) *BaseConfigElement {
 	return &BaseConfigElement{
 		parent: parent,
@@ -51,26 +50,30 @@ func NewBaseConfigElement(parent *Module, name string, tfType string) *BaseConfi
 	}
 }
 
+// GetParent returns the parent module of this element.
 func (e *BaseConfigElement) GetParent() *Module {
 	return e.parent
 }
 
+// SetParent sets the parent module of this element.
 func (e *BaseConfigElement) SetParent(parent *Module) {
 	e.parent = parent
 }
 
+// GetName returns the name of this element.
 func (e *BaseConfigElement) GetName() string {
 	return e.name
 }
 
+// GetQualifiedName returns the qualified name ([parentQualifiedName.]name) of this element.
 func (e *BaseConfigElement) GetQualifiedName() string {
 	if e.parent != nil {
 		return e.parent.GetQualifiedName() + "." + e.name
-	} else {
-		return e.name
 	}
+	return e.name
 }
 
+// GetTfType returns the Terraform type of this element.
 func (e *BaseConfigElement) GetTfType() string {
 	return e.tfType
 }
@@ -81,6 +84,7 @@ type Module struct {
 	Children map[string]ConfigElement
 }
 
+// NewModule creates a new module using the specified parent module and name.
 func NewModule(parent *Module, name string) *Module {
 	return &Module{
 		BaseConfigElement: &BaseConfigElement{
@@ -92,22 +96,24 @@ func NewModule(parent *Module, name string) *Module {
 	}
 }
 
+// AddChild adds the specified element to this module.
 func (m *Module) AddChild(e ConfigElement) {
 	m.Children[e.GetName()] = e
 }
 
 type Dependency struct {
-	// This element depends on the `Dst` element.
-	Src ConfigElement
+	// This element depends on the `Destination` element.
+	Source ConfigElement
 
-	// This element is a dependency of the `Src` element.
-	Dst ConfigElement
+	// This element is a dependency of the `Source` element.
+	Destination ConfigElement
 }
 
-func NewDependency(src ConfigElement, dst ConfigElement) *Dependency {
+// NewDependency creates a new dependency using the specified source and destination elements.
+func NewDependency(source, destination ConfigElement) *Dependency {
 	return &Dependency{
-		Src: src,
-		Dst: dst,
+		Source:      source,
+		Destination: destination,
 	}
 }
 
@@ -116,6 +122,7 @@ type Graph struct {
 	Dependencies []*Dependency
 }
 
+// NewGraph creates a new graph using the specified root module and dependencies.
 func NewGraph(root *Module, dependencies []*Dependency) *Graph {
 	return &Graph{
 		Root:         root,

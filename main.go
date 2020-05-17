@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	outputTypeCytoscapeJson = "cyto-json"
-	outputTypeCytoscapeHtml = "cyto-html"
+	outputTypeCytoscapeJSON = "cyto-json"
+	outputTypeCytoscapeHTML = "cyto-html"
 	outputTypeGraphivz      = "graphviz"
 )
 
@@ -28,7 +28,7 @@ func getWorkingDir() string {
 func main() {
 	// Prepare command line options.
 	inputFilePath := flag.String("input", "", "Path of the input Graphviz file to read, if not set 'stdin' is used")
-	outputType := flag.String("output-type", "", fmt.Sprintf("Type of output, can be one the following : %s (default), %s, %s", outputTypeCytoscapeJson, outputTypeCytoscapeHtml, outputTypeGraphivz))
+	outputType := flag.String("output-type", "", fmt.Sprintf("Type of output, can be one the following : %s (default), %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphivz))
 	outputFilePath := flag.String("output", "", "Path of the output Graphviz file to write, if not set 'stdout' is used")
 	debug := flag.Bool("debug", false, "Prints debugging information to stderr")
 	// Input reading options.
@@ -74,17 +74,18 @@ func main() {
 	}
 
 	switch *outputType {
-	case "", outputTypeCytoscapeJson:
-		log.Debug().Msg("Outputting graph data to Cytoscape.js JSON format")
-		cytoscape.WriteGraphJson(outputFile, graph)
-	case outputTypeCytoscapeHtml:
-		log.Debug().Msg("Outputting graph data to Cytoscape.js HTML format")
-		cytoscape.WriteGraphHtml(outputFile, graph, &cytoscape.FormattingOptions{
+	case "", outputTypeCytoscapeJSON:
+		log.Debug().Msg("Output graph data to Cytoscape.js JSON format")
+		cytoscape.WriteGraphJSON(outputFile, graph)
+	case outputTypeCytoscapeHTML:
+		// TODO : param template in the log
+		log.Debug().Msg("Output graph to HTML")
+		cytoscape.WriteGraphHTML(outputFile, graph, &cytoscape.FormattingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})
 	case outputTypeGraphivz:
-		log.Debug().Msg("Outputting graph data to Graphviz Dot format")
+		log.Debug().Msg("Output graph data to Graphviz Dot format")
 		graphviz.WriteGraph(outputFile, graph, &graphviz.FormattingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,

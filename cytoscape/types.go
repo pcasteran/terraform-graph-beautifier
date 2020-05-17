@@ -2,7 +2,7 @@ package cytoscape
 
 type NodeData struct {
 	// Standard properties
-	Id     string  `json:"id"`
+	ID     string  `json:"id"`
 	Parent *string `json:"parent,omitempty"`
 
 	// Custom properties.
@@ -20,7 +20,7 @@ type Node struct {
 }
 
 type EdgeData struct {
-	Id     string `json:"id"`
+	ID     string `json:"id"`
 	Source string `json:"source"`
 	Target string `json:"target"`
 }

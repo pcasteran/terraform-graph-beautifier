@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// LoadGraph reads the Graphviz graph from the specified reader and returns the corresponding Terraform graph.
 func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *tfgraph.Graph {
 	// Load the graph from the specified input.
 	graphIn := readGraph(inputFilePath, keepTfJunk, excludePatterns)
@@ -81,7 +82,7 @@ func buildTfGraph(graph *gographviz.Graph) *tfgraph.Graph {
 				Msg("Edge destination is referencing an invalid node")
 		}
 
-		edges = append(edges, &tfgraph.Dependency{Src: src, Dst: dst})
+		edges = append(edges, tfgraph.NewDependency(src, dst))
 	}
 
 	// Return the "root" module and the edges.
