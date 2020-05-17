@@ -110,3 +110,15 @@ func NewDependency(src ConfigElement, dst ConfigElement) *Dependency {
 		Dst: dst,
 	}
 }
+
+type Graph struct {
+	Root         *Module
+	Dependencies []*Dependency
+}
+
+func NewGraph(root *Module, dependencies []*Dependency) *Graph {
+	return &Graph{
+		Root:         root,
+		Dependencies: dependencies,
+	}
+}

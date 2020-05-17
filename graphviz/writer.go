@@ -13,27 +13,22 @@ type FormattingOptions struct {
 	EmbedModules bool
 }
 
-func WriteGraph(
-	writer io.Writer,
-	root *tfgraph.Module,
-	dependencies []*tfgraph.Dependency,
-	formattingOptions *FormattingOptions,
-) {
-	// Build the output Graphviz graph.
-	graph := gographviz.NewGraph()
-	graph.Name = escape(formattingOptions.GraphName)
-	graph.Directed = true
-	_ = graph.AddAttr(graph.Name, string(gographviz.NewRank), "true")
-	_ = graph.AddAttr(graph.Name, string(gographviz.Compound), "true")
-	_ = graph.AddAttr(graph.Name, string(gographviz.RankDir), "TB")
+func WriteGraph(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
+	// Build the output Graphviz outputGraph.
+	outputGraph := gographviz.NewGraph()
+	outputGraph.Name = escape(formattingOptions.GraphName)
+	outputGraph.Directed = true
+	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.NewRank), "true")
+	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.Compound), "true")
+	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.RankDir), "TB")
 
 	// Add all the modules as clusters.
-	createCluster(graph, "", root, formattingOptions)
+	createCluster(outputGraph, "", graph.Root, formattingOptions)
 
 	// Add the edges.
-	for _, dep := range dependencies {
+	for _, dep := range graph.Dependencies {
 		shape, style := getEdgeShapeAndStyle(dep)
-		_ = graph.AddEdge(
+		_ = outputGraph.AddEdge(
 			escape(dep.Src.GetQualifiedName()),
 			escape(dep.Dst.GetQualifiedName()),
 			true,
@@ -45,8 +40,7 @@ func WriteGraph(
 	}
 
 	// Output the result.
-	output := graph.String()
-	io.WriteString(writer, output)
+	_, _ = io.WriteString(writer, outputGraph.String())
 }
 
 func createCluster(graph *gographviz.Graph, parentClusterName string, module *tfgraph.Module, formattingOptions *FormattingOptions) {

@@ -16,9 +16,9 @@ type FormattingOptions struct {
 	EmbedModules bool // TODO
 }
 
-func WriteGraphJson(writer io.Writer, root *tfgraph.Module, dependencies []*tfgraph.Dependency) {
+func WriteGraphJson(writer io.Writer, graph *tfgraph.Graph) {
 	// Get the graph elements.
-	graphElements := getGraphElements(root, dependencies)
+	graphElements := getGraphElements(graph)
 
 	// Encode the result to JSON.
 	enc := json.NewEncoder(writer)
@@ -27,16 +27,11 @@ func WriteGraphJson(writer io.Writer, root *tfgraph.Module, dependencies []*tfgr
 	}
 }
 
-func WriteGraphHtml(
-	writer io.Writer,
-	root *tfgraph.Module,
-	dependencies []*tfgraph.Dependency,
-	formattingOptions *FormattingOptions,
-) {
+func WriteGraphHtml(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
 	// Get the graph elements JSON.
 	var buf bytes.Buffer
 	graphWriter := bufio.NewWriter(&buf)
-	WriteGraphJson(graphWriter, root, dependencies)
+	WriteGraphJson(graphWriter, graph)
 
 	// TODO : give template as parameter
 	tmpl := template.Must(template.ParseFiles("index.gohtml"))
@@ -49,7 +44,7 @@ func WriteGraphHtml(
 	}
 }
 
-func getGraphElements(root *tfgraph.Module, dependencies []*tfgraph.Dependency) *Elements {
+func getGraphElements(graph *tfgraph.Graph) *Elements {
 	// Get the graph nodes.
 	var nodes []*Node
 	var addElement func(parent *tfgraph.Module, element tfgraph.ConfigElement)
@@ -76,11 +71,11 @@ func getGraphElements(root *tfgraph.Module, dependencies []*tfgraph.Dependency) 
 			}
 		}
 	}
-	addElement(nil, root)
+	addElement(nil, graph.Root)
 
 	// Get the graph edges.
 	var edges []*Edge
-	for _, dep := range dependencies {
+	for _, dep := range graph.Dependencies {
 		src := dep.Src.GetQualifiedName()
 		dst := dep.Dst.GetQualifiedName()
 		edge := &Edge{

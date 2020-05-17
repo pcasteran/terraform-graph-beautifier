@@ -7,18 +7,16 @@ import (
 	"strings"
 )
 
-func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) (*tfgraph.Module, []*tfgraph.Dependency) {
+func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *tfgraph.Graph {
 	// Load the graph from the specified input.
 	graphIn := readGraph(inputFilePath, keepTfJunk, excludePatterns)
 
 	// Build the Terraform resource graph.
-	tfGraph, dependencies := buildTfGraph(graphIn)
-
-	return tfGraph, dependencies
+	return buildTfGraph(graphIn)
 }
 
 // Builds the Terraform configuration element hierarchy from the specified Graphviz graph.
-func buildTfGraph(graph *gographviz.Graph) (*tfgraph.Module, []*tfgraph.Dependency) {
+func buildTfGraph(graph *gographviz.Graph) *tfgraph.Graph {
 	// Create the graph root and build the graph from here.
 	tfGraphRoot := tfgraph.NewModule(nil, "")
 	nodeNameToConfigElement := make(map[string]tfgraph.ConfigElement, len(graph.Nodes.Nodes))
@@ -89,5 +87,5 @@ func buildTfGraph(graph *gographviz.Graph) (*tfgraph.Module, []*tfgraph.Dependen
 	// Return the "root" module and the edges.
 	root := tfGraphRoot.Children["module.root"].(*tfgraph.Module)
 	root.SetParent(nil)
-	return root, edges
+	return tfgraph.NewGraph(root, edges)
 }

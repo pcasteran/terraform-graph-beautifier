@@ -55,8 +55,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Load the graph from the specified input.
-	// TODO : type Graph
-	root, dependencies := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
+	graph := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
 
 	// Write the result to the specified output.
 	outputFile := os.Stdout
@@ -77,16 +76,16 @@ func main() {
 	switch *outputType {
 	case "", outputTypeCytoscapeJson:
 		log.Debug().Msg("Outputting graph data to Cytoscape.js JSON format")
-		cytoscape.WriteGraphJson(outputFile, root, dependencies)
+		cytoscape.WriteGraphJson(outputFile, graph)
 	case outputTypeCytoscapeHtml:
 		log.Debug().Msg("Outputting graph data to Cytoscape.js HTML format")
-		cytoscape.WriteGraphHtml(outputFile, root, dependencies, &cytoscape.FormattingOptions{
+		cytoscape.WriteGraphHtml(outputFile, graph, &cytoscape.FormattingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})
 	case outputTypeGraphivz:
 		log.Debug().Msg("Outputting graph data to Graphviz Dot format")
-		graphviz.WriteGraph(outputFile, root, dependencies, &graphviz.FormattingOptions{
+		graphviz.WriteGraph(outputFile, graph, &graphviz.FormattingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})
