@@ -55,20 +55,33 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Load the graph from the specified input.
-	graph := graphviz.LoadGraph(*inputFilePath, *keepTfJunk, excludePatterns)
+	inputFile := os.Stdin
+	var err error
+	if *inputFilePath != "" {
+		// Read from the specified file.
+		inputFile, err = os.Open(*inputFilePath)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Cannot open the file for reading")
+		}
+		defer func() {
+			if err := inputFile.Close(); err != nil {
+				log.Fatal().Err(err).Msg("Cannot close the file after reading")
+			}
+		}()
+	}
+	graph := graphviz.LoadGraph(inputFile, *keepTfJunk, excludePatterns)
 
 	// Write the result to the specified output.
 	outputFile := os.Stdout
-	var err error
 	if *outputFilePath != "" {
 		// Write to the specified file.
 		outputFile, err = os.Create(*outputFilePath)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Cannot open the specified file for writing")
+			log.Fatal().Err(err).Msg("Cannot open the file for writing")
 		}
 		defer func() {
 			if err := outputFile.Close(); err != nil {
-				log.Fatal().Err(err).Msg("Cannot close the specified after writing")
+				log.Fatal().Err(err).Msg("Cannot close the file after writing")
 			}
 		}()
 	}

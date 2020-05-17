@@ -4,13 +4,14 @@ import (
 	"github.com/awalterschulze/gographviz"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
+	"io"
 	"strings"
 )
 
 // LoadGraph reads the Graphviz graph from the specified reader and returns the corresponding Terraform graph.
-func LoadGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *tfgraph.Graph {
+func LoadGraph(reader io.Reader, keepTfJunk bool, excludePatterns []string) *tfgraph.Graph {
 	// Load the graph from the specified input.
-	graphIn := readGraph(inputFilePath, keepTfJunk, excludePatterns)
+	graphIn := readGraph(reader, keepTfJunk, excludePatterns)
 
 	// Build the Terraform resource graph.
 	return buildTfGraph(graphIn)

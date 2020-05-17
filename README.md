@@ -48,4 +48,4 @@ tf-types:
     - issues Github plutot que TODO
     - protéger master
 - Tester mode : module nesting ou referencing (compound)
-- Makefile (gobuild, golint)
+- Makefile (gobuild, golint ./...)

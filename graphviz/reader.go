@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"github.com/awalterschulze/gographviz"
 	"github.com/rs/zerolog/log"
-	"os"
+	"io"
 	"regexp"
 	"strings"
 )
@@ -16,9 +16,9 @@ type replaceStruct struct {
 
 var /* const */ tfOutputFixes = map[*regexp.Regexp]replaceStruct{
 	// Replace : `"[root] rsc_type.rsc_name"` => `"module.root.rsc_type.rsc_name"`
-	regexp.MustCompile(`"\[root] `): replaceStruct{`"module.root.`, false},
+	regexp.MustCompile(`"\[root] `): {`"module.root.`, false},
 	// Replace : map["foo"] => map['foo']
-	regexp.MustCompile(`\["(.*?)"]`): replaceStruct{"['${1}']", true},
+	regexp.MustCompile(`\["(.*?)"]`): {"['${1}']", true},
 }
 
 var /* const */ tfJunkMatches = []*regexp.Regexp{
@@ -27,7 +27,7 @@ var /* const */ tfJunkMatches = []*regexp.Regexp{
 	regexp.MustCompile(`"module.root.provider\..* \(close\)"`),
 }
 
-func readGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
+func readGraph(reader io.Reader, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
 	// Build all the patterns to exclude.
 	var exclusionPatterns []*regexp.Regexp
 	if !keepTfJunk {
@@ -37,20 +37,8 @@ func readGraph(inputFilePath string, keepTfJunk bool, excludePatterns []string) 
 		exclusionPatterns = append(exclusionPatterns, regexp.MustCompile(pattern))
 	}
 
-	// Get the file to use.
-	file := os.Stdin
-	var err error
-	if inputFilePath != "" {
-		// Read from the specified file.
-		file, err = os.Open(inputFilePath)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Cannot open the specified file for reading")
-		}
-		defer file.Close()
-	}
-
 	// Read the input line by line.
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(reader)
 	var sb strings.Builder
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
