@@ -24,9 +24,13 @@ var /* const */ ManagedTerraformTypes = map[string]interface{}{
 	TfProvider: nil,
 }
 
+// TfConfigElementRegexp allows to match valid Terraform configuration elements and extract their type+name.
 var /* const */ TfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
+
+// TfModuleRegexp allow to match Terraform modules and extract their name.
 var /* const */ TfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
 
+// ConfigElement represents a generic Terraform configuration element.
 type ConfigElement interface {
 	GetParent() *Module
 	SetParent(parent *Module)
@@ -35,6 +39,7 @@ type ConfigElement interface {
 	GetTfType() string
 }
 
+// BaseConfigElement represents a concrete Terraform configuration element.
 type BaseConfigElement struct {
 	parent *Module
 	name   string
@@ -78,6 +83,7 @@ func (e *BaseConfigElement) GetTfType() string {
 	return e.tfType
 }
 
+// Module represents a Terraform configuration module.
 type Module struct {
 	*BaseConfigElement
 
@@ -101,6 +107,7 @@ func (m *Module) AddChild(e ConfigElement) {
 	m.Children[e.GetName()] = e
 }
 
+// Dependency represents a directed dependency between two Terraform configuration elements.
 type Dependency struct {
 	// This element depends on the `Destination` element.
 	Source ConfigElement
@@ -117,6 +124,7 @@ func NewDependency(source, destination ConfigElement) *Dependency {
 	}
 }
 
+// Graph represents a Terraform configuration (elements + dependencies).
 type Graph struct {
 	Root         *Module
 	Dependencies []*Dependency

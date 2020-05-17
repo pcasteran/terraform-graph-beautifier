@@ -80,13 +80,13 @@ func main() {
 	case outputTypeCytoscapeHTML:
 		// TODO : param template in the log
 		log.Debug().Msg("Output graph to HTML")
-		cytoscape.WriteGraphHTML(outputFile, graph, &cytoscape.FormattingOptions{
+		cytoscape.WriteGraphHTML(outputFile, graph, &cytoscape.RenderingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})
 	case outputTypeGraphivz:
 		log.Debug().Msg("Output graph data to Graphviz Dot format")
-		graphviz.WriteGraph(outputFile, graph, &graphviz.FormattingOptions{
+		graphviz.WriteGraph(outputFile, graph, &graphviz.RenderingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})

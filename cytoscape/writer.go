@@ -11,7 +11,8 @@ import (
 	"io"
 )
 
-type FormattingOptions struct {
+// RenderingOptions contains all the options used during graph rendering.
+type RenderingOptions struct {
 	GraphName    string
 	EmbedModules bool // TODO
 }
@@ -29,7 +30,7 @@ func WriteGraphJSON(writer io.Writer, graph *tfgraph.Graph) {
 }
 
 // WriteGraphHTML writes the specified Terraform graph to an HTML file using the given template.
-func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
+func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOptions) {
 	// Get the graph elements JSON.
 	var buf bytes.Buffer
 	graphWriter := bufio.NewWriter(&buf)
@@ -38,7 +39,7 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, formattingOptions *F
 	// TODO : give template as parameter
 	tmpl := template.Must(template.ParseFiles("index.gohtml"))
 	err := tmpl.Execute(writer, &map[string]interface{}{
-		"PageTitle":         formattingOptions.GraphName,
+		"PageTitle":         options.GraphName,
 		"GraphElementsJSON": template.JS(buf.String()),
 	})
 	if err != nil {

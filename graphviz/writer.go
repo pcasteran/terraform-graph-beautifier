@@ -8,23 +8,24 @@ import (
 
 const clusterRefNodeName = "clusterRef"
 
-type FormattingOptions struct {
+// RenderingOptions contains all the options used during graph rendering.
+type RenderingOptions struct {
 	GraphName    string
 	EmbedModules bool
 }
 
 // WriteGraph writes the specified Terraform graph in Graphviz Dot format.
-func WriteGraph(writer io.Writer, graph *tfgraph.Graph, formattingOptions *FormattingOptions) {
+func WriteGraph(writer io.Writer, graph *tfgraph.Graph, options *RenderingOptions) {
 	// Build the output Graphviz outputGraph.
 	outputGraph := gographviz.NewGraph()
-	outputGraph.Name = escape(formattingOptions.GraphName)
+	outputGraph.Name = escape(options.GraphName)
 	outputGraph.Directed = true
 	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.NewRank), "true")
 	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.Compound), "true")
 	_ = outputGraph.AddAttr(outputGraph.Name, string(gographviz.RankDir), "TB")
 
 	// Add all the modules as clusters.
-	createCluster(outputGraph, "", graph.Root, formattingOptions)
+	createCluster(outputGraph, "", graph.Root, options)
 
 	// Add the edges.
 	for _, dep := range graph.Dependencies {
@@ -44,11 +45,11 @@ func WriteGraph(writer io.Writer, graph *tfgraph.Graph, formattingOptions *Forma
 	_, _ = io.WriteString(writer, outputGraph.String())
 }
 
-func createCluster(graph *gographviz.Graph, parentClusterName string, module *tfgraph.Module, formattingOptions *FormattingOptions) {
+func createCluster(graph *gographviz.Graph, parentClusterName string, module *tfgraph.Module, options *RenderingOptions) {
 	// Create the module's cluster.
 	parent := module.GetParent()
 	parentName := graph.Name
-	if formattingOptions.EmbedModules && parent != nil {
+	if options.EmbedModules && parent != nil {
 		parentName = escape(parentClusterName)
 	}
 	clusterName := "cluster_" + module.GetQualifiedName()
@@ -59,7 +60,7 @@ func createCluster(graph *gographviz.Graph, parentClusterName string, module *tf
 			string(gographviz.Label): escape(module.GetName()),
 		},
 	)
-	if !formattingOptions.EmbedModules {
+	if !options.EmbedModules {
 		// Add an invisible node to the cluster used for the module's dependency edges.
 		clusterRef := clusterName + "." + clusterRefNodeName
 		_ = graph.AddNode(
@@ -102,7 +103,7 @@ func createCluster(graph *gographviz.Graph, parentClusterName string, module *tf
 		subModule, ok := child.(*tfgraph.Module)
 		if ok {
 			// Yes, recursively add the sub-module
-			createCluster(graph, clusterName, subModule, formattingOptions)
+			createCluster(graph, clusterName, subModule, options)
 		} else {
 			// No, add the config element to the current cluster.
 			shape, style := getNodeShapeAndStyle(child)
