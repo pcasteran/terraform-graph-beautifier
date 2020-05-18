@@ -69,6 +69,7 @@
             {
                 selector: 'node.module',
                 style: {
+                    // TODO : Put label text inside the box
                     'text-valign': 'top',
                     'text-halign': 'center',
                     'background-color': function (ele) {
@@ -100,11 +101,19 @@
             {
                 selector: 'edge',
                 style: {
-                    'width': 3,
-                    'line-color': '#ccc',
-                    'target-arrow-color': '#ff0058',
+                    'width': 1,
+                    'line-color': '#000000',
+                    'source-arrow-color': '#000000',
+                    'target-arrow-color': '#000000',
                     'target-arrow-shape': 'triangle',
                     'curve-style': 'bezier',
+                }
+            },
+            {
+                selector: 'edge.module-module',
+                style: {
+                    'width': 2,
+                    'source-arrow-shape': 'diamond',
                 }
             }
         ],

@@ -14,13 +14,13 @@ import (
 // RenderingOptions contains all the options used during graph rendering.
 type RenderingOptions struct {
 	GraphName    string
-	EmbedModules bool // TODO
+	EmbedModules bool
 }
 
 // WriteGraphJSON writes the specified Terraform graph in Cytoscape.js JSON format.
-func WriteGraphJSON(writer io.Writer, graph *tfgraph.Graph) {
+func WriteGraphJSON(writer io.Writer, graph *tfgraph.Graph, options *RenderingOptions) {
 	// Get the graph elements.
-	graphElements := getGraphElements(graph)
+	graphElements := getGraphElements(graph, options)
 
 	// Encode the result to JSON.
 	enc := json.NewEncoder(writer)
@@ -34,7 +34,8 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	// Get the graph elements JSON.
 	var buf bytes.Buffer
 	graphWriter := bufio.NewWriter(&buf)
-	WriteGraphJSON(graphWriter, graph)
+	WriteGraphJSON(graphWriter, graph, options)
+	graphWriter.Flush()
 
 	// TODO : give template as parameter
 	tmpl := template.Must(template.ParseFiles("index.gohtml"))
@@ -47,7 +48,11 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	}
 }
 
-func getGraphElements(graph *tfgraph.Graph) *Elements {
+func getGraphElements(graph *tfgraph.Graph, options *RenderingOptions) *Elements {
+	// First, copy the graph dependencies as we may need to had some for the module -> module relations.
+	deps := make([]*tfgraph.Dependency, len(graph.Dependencies))
+	copy(deps, graph.Dependencies)
+
 	// Get the graph nodes.
 	var nodes []*Node
 	var addElement func(parent *tfgraph.Module, element tfgraph.ConfigElement)
@@ -69,6 +74,15 @@ func getGraphElements(graph *tfgraph.Graph) *Elements {
 		// If the element is a module, recursively add its children.
 		module, ok := element.(*tfgraph.Module)
 		if ok {
+			if !options.EmbedModules && parent != nil {
+				// Remove the parent and create a dependency for the module -> module relation.
+				node.Data.Parent = nil
+				deps = append(deps, &tfgraph.Dependency{
+					Source:      parent,
+					Destination: element,
+				})
+			}
+
 			for _, child := range module.Children {
 				addElement(module, child)
 			}
@@ -78,15 +92,16 @@ func getGraphElements(graph *tfgraph.Graph) *Elements {
 
 	// Get the graph edges.
 	var edges []*Edge
-	for _, dep := range graph.Dependencies {
+	for _, dep := range deps {
 		src := dep.Source.GetQualifiedName()
 		dst := dep.Destination.GetQualifiedName()
 		edge := &Edge{
 			Data: EdgeData{
-				ID:     fmt.Sprintf("%s -> %s", src, dst),
+				ID:     fmt.Sprintf("%s-%s", src, dst),
 				Source: src,
 				Target: dst,
 			},
+			Classes: []string{fmt.Sprintf("%s-%s", dep.Source.GetTfType(), dep.Destination.GetTfType())},
 		}
 		edges = append(edges, edge)
 	}

@@ -85,7 +85,10 @@ func main() {
 	switch *outputType {
 	case outputTypeCytoscapeJSON:
 		log.Debug().Msg("Output graph data to Cytoscape.js JSON format")
-		cytoscape.WriteGraphJSON(outputFile, graph)
+		cytoscape.WriteGraphJSON(outputFile, graph, &cytoscape.RenderingOptions{
+			GraphName:    *graphName,
+			EmbedModules: *embedModules,
+		})
 	case outputTypeCytoscapeHTML:
 		// TODO : param template in the log
 		log.Debug().Msg("Output graph to HTML")

@@ -49,3 +49,4 @@ tf-types:
     - protéger master
 - Tester mode : module nesting ou referencing (compound)
 - Makefile (gobuild, golint ./...)
+- Test Firefox
