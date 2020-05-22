@@ -29,3 +29,6 @@ The loading of the input graph involves several steps:
     - protéger master
 - Makefile (gobuild, golint ./...)
 - Test Firefox
+- Asset (template) embedding done with XXX
+    - fichier generes checked-in pour que ce soit go gettable
+    - mode development (version locale, pas celle package) : configurer l'IDE pour utiliser le build tag (link) `dev`

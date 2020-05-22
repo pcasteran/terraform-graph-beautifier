@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/pcasteran/terraform-graph-beautifier/assets"
 	"github.com/pcasteran/terraform-graph-beautifier/cytoscape"
 	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
