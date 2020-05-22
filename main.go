@@ -14,7 +14,7 @@ import (
 const (
 	outputTypeCytoscapeJSON = "cyto-json"
 	outputTypeCytoscapeHTML = "cyto-html"
-	outputTypeGraphivz      = "graphviz"
+	outputTypeGraphviz      = "graphviz"
 )
 
 func getWorkingDir() string {
@@ -28,7 +28,7 @@ func getWorkingDir() string {
 func main() {
 	// Prepare command line options.
 	inputFilePath := flag.String("input", "", "Path of the input Graphviz file to read, if not set 'stdin' is used")
-	outputType := flag.String("output-type", outputTypeCytoscapeJSON, fmt.Sprintf("Type of output, can be one the following : %s, %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphivz))
+	outputType := flag.String("output-type", outputTypeCytoscapeJSON, fmt.Sprintf("Type of output, can be one the following : %s, %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphviz))
 	outputFilePath := flag.String("output", "", "Path of the output file to write, if not set 'stdout' is used")
 	debug := flag.Bool("debug", false, "Print debugging information to stderr")
 	// Input reading options.
@@ -96,7 +96,7 @@ func main() {
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
 		})
-	case outputTypeGraphivz:
+	case outputTypeGraphviz:
 		log.Debug().Msg("Output graph data to Graphviz Dot format")
 		graphviz.WriteGraph(outputFile, graph, &graphviz.RenderingOptions{
 			GraphName:    *graphName,
