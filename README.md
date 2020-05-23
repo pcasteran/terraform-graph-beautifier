@@ -15,6 +15,15 @@ The loading of the input graph involves several steps:
    - Using user-provided pattern(s) to exclude some elements (resource, var, module, provider, ...) from the output.
    - These patterns are [Go regexp](https://golang.org/pkg/regexp/) and are matched line by line against the output of the **cleaning** step, so use the `"root.rsc_type.rsc_name"` naming. 
 
+## HTML output templating
+The command uses Go [HTML templates](https://golang.org/pkg/html/template/) to create the Cytoscape.js HTML output.
+These templates and all the command assets are embedded in the binary using [pkger](https://github.com/markbates/pkger).
+The generated Go file is checked-in in order for the repository to be "go-gettable".
+
+In development mode, when working on the templates for example, you don't want to launch this generation process every time you modify the asset files; instead you would prefer using the current version of these files.
+To do this, simply configure your IDE to use the build tag `skippkger`.
+
+
 ## TODO
 - Dans samples, configs TF de tests
   - TF only (local file, random) avec:
@@ -27,8 +36,4 @@ The loading of the input graph involves several steps:
     - actions to build
     - issues Github plutot que TODO
     - protéger master
-- Makefile (gobuild, golint ./...)
 - Test Firefox
-- Asset (template) embedding done with XXX
-    - fichier generes checked-in pour que ce soit go gettable
-    - mode development (version locale, pas celle package) : configurer l'IDE pour utiliser le build tag (link) `dev`
