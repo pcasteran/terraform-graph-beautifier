@@ -9,12 +9,15 @@ import (
 	"github.com/rs/zerolog/log"
 	"html/template"
 	"io"
+	"io/ioutil"
+	"net/http"
 )
 
 // RenderingOptions contains all the options used during graph rendering.
 type RenderingOptions struct {
 	GraphName    string
 	EmbedModules bool
+	HTMLTemplate http.File
 }
 
 // WriteGraphJSON writes the specified Terraform graph in Cytoscape.js JSON format.
@@ -37,9 +40,13 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	WriteGraphJSON(graphWriter, graph, options)
 	graphWriter.Flush()
 
-	// TODO : give template as parameter
-	tmpl := template.Must(template.ParseFiles("index.gohtml"))
-	err := tmpl.Execute(writer, &map[string]interface{}{
+	// Load and execute the template.
+	b, err := ioutil.ReadAll(options.HTMLTemplate)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Cannot read HTML template")
+	}
+	tmpl := template.Must(template.New("cyto-html").Parse(string(b)))
+	err = tmpl.Execute(writer, &map[string]interface{}{
 		"PageTitle":         options.GraphName,
 		"GraphElementsJSON": template.JS(buf.String()),
 	})

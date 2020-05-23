@@ -8,6 +8,7 @@ import (
 	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -29,7 +30,7 @@ func getWorkingDir() string {
 func main() {
 	// Prepare command line options.
 	inputFilePath := flag.String("input", "", "Path of the input Graphviz file to read, if not set 'stdin' is used")
-	outputType := flag.String("output-type", outputTypeCytoscapeJSON, fmt.Sprintf("Type of output, can be one the following : %s, %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphviz))
+	outputType := flag.String("output-type", outputTypeCytoscapeHTML, fmt.Sprintf("Type of output, can be one the following : %s, %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphviz))
 	outputFilePath := flag.String("output", "", "Path of the output file to write, if not set 'stdout' is used")
 	debug := flag.Bool("debug", false, "Print debugging information to stderr")
 	// Input reading options.
@@ -39,6 +40,7 @@ func main() {
 	// Output writing options.
 	graphName := flag.String("graph-name", getWorkingDir(), "Name of the output graph, defaults to working directory name")
 	embedModules := flag.Bool("embed-modules", true, "Embed a module sub-graph inside its parent if true; otherwise the two modules are siblings and an edge is drawn from the parent to the child")
+	cytoHTMLTemplatePath := flag.String("cyto-html-template", "", fmt.Sprintf("Path of the HTML template to use for Cytoscape.js rendering (output-type=\"%s\"), if not set a default one is used", outputTypeCytoscapeHTML))
 
 	// Parse command line arguments.
 	flag.Parse()
@@ -91,11 +93,30 @@ func main() {
 			EmbedModules: *embedModules,
 		})
 	case outputTypeCytoscapeHTML:
-		// TODO : param template in the log
 		log.Debug().Msg("Output graph to HTML")
+
+		// Open HTML template file.
+		var template http.File = nil
+		if *cytoHTMLTemplatePath != "" {
+			// Use the specified template file.
+			template, err = os.Open(*cytoHTMLTemplatePath)
+		} else {
+			// Use the default template file.
+			template, err = assets.Templates.Open("index.gohtml")
+		}
+		if err != nil {
+			log.Fatal().Err(err).Msg("Cannot open the HTML template file for reading")
+		}
+		defer func() {
+			if err := template.Close(); err != nil {
+				log.Fatal().Err(err).Msg("Cannot close the file after reading")
+			}
+		}()
+
 		cytoscape.WriteGraphHTML(outputFile, graph, &cytoscape.RenderingOptions{
 			GraphName:    *graphName,
 			EmbedModules: *embedModules,
+			HTMLTemplate: template,
 		})
 	case outputTypeGraphviz:
 		log.Debug().Msg("Output graph data to Graphviz Dot format")
