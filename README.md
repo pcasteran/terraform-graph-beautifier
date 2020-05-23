@@ -27,18 +27,3 @@ The generated `pkged.go` file is checked-in in order for the repository to be "g
 
 In development mode, when working on the templates for example, you don't want to launch the `pkged.go` generation process every time you modify an asset file; instead you would prefer using the current version of the file.
 To do this, simply configure your IDE to use the build tag `skippkger`.
-
-
-## TODO
-- Dans samples, configs TF de tests
-  - TF only (local file, random) avec:
-    - data
-    - variables, locals et outputs
-    - maps et lists
-  - Utilisation des modules GCP
-- Check (orphan), (close), (removed)
-- Github:
-    - actions to build
-    - issues Github plutot que TODO
-    - protéger master
-- Test Firefox
