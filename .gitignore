@@ -16,4 +16,4 @@
 
 .idea/
 
-/terraform-graph-beautifier
+/terraform-graph-beautifier*

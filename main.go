@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/pcasteran/terraform-graph-beautifier/assets"
+	"github.com/markbates/pkger"
 	"github.com/pcasteran/terraform-graph-beautifier/cytoscape"
 	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
@@ -108,7 +108,7 @@ func main() {
 			template, err = os.Open(*cytoHTMLTemplatePath)
 		} else {
 			// Use the default template file.
-			template, err = assets.Templates.Open("index.gohtml")
+			template, err = pkger.Open("/templates/index.gohtml")
 		}
 		if err != nil {
 			log.Fatal().Err(err).Msg("Cannot open the HTML template file for reading")

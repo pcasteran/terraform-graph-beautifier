@@ -5,7 +5,7 @@ VERSION := $(shell git describe --always --long --dirty)
 all: build
 
 setup:
-	go get -u github.com/shurcooL/vfsgen
+	go get github.com/markbates/pkger/cmd/pkger
 
 tools:
 	go get -u golang.org/x/lint/golint
@@ -20,7 +20,7 @@ tidy:
 	go mod tidy
 
 generate:
-	go generate -tags=dev ./...
+	pkger
 
 build: generate
 	go build -i -v -o ${OUT}-v${VERSION} -ldflags="-X main.version=${VERSION}" ${PKG}
