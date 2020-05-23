@@ -1,3 +1,7 @@
+OUT := terraform-graph-beautifier
+PKG := github.com/pcasteran/terraform-graph-beautifier
+VERSION := $(shell git describe --always --long --dirty)
+
 all: build
 
 setup:
@@ -12,11 +16,14 @@ lint:
 fmt:
 	go fmt ./...
 
+tidy:
+	go mod tidy
+
 generate:
 	go generate -tags=dev ./...
 
 build: generate
-	go build -ldflags "-X main.version=$(git describe --tags)"
+	go build -i -v -o ${OUT}-v${VERSION} -ldflags="-X main.version=${VERSION}" ${PKG}
 
 install:
 	go install .

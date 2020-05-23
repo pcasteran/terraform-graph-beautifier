@@ -33,6 +33,7 @@ func main() {
 	outputType := flag.String("output-type", outputTypeCytoscapeHTML, fmt.Sprintf("Type of output, can be one the following : %s, %s, %s", outputTypeCytoscapeJSON, outputTypeCytoscapeHTML, outputTypeGraphviz))
 	outputFilePath := flag.String("output", "", "Path of the output file to write, if not set 'stdout' is used")
 	debug := flag.Bool("debug", false, "Print debugging information to stderr")
+	printVersion := flag.Bool("v", false, "Print command version and exit")
 	// Input reading options.
 	var excludePatterns arrayFlags
 	flag.Var(&excludePatterns, "exclude", "Pattern (regexp) of the resource to filter out (can be repeated multiple times)")
@@ -44,6 +45,11 @@ func main() {
 
 	// Parse command line arguments.
 	flag.Parse()
+
+	if *printVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	// Configure logging.
 	// Default level for this example is info, unless debug flag is present.
