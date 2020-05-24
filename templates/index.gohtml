@@ -23,6 +23,21 @@
 <body>
 <div id="cy"></div>
 <script>
+    // Color palette used for the modules background.
+    // The palette can be previewed here : https://coolors.co/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff-fffffc
+    const moduleBgColorPalette = [
+        '#FFADAD',
+        '#FFD6A5',
+        '#FDFFB6',
+        '#CAFFBF',
+        '#9BF6FF',
+        '#A0C4FF',
+        '#BDB2FF',
+        '#FFC6FF',
+        '#FFFFFC',
+    ];
+
+    // Create the DOM element used to draw the graph.
     const cy = cytoscape({
         container: document.getElementById('cy'),
         layout: {
@@ -77,18 +92,7 @@
                     'text-valign': 'top',
                     'text-halign': 'center',
                     'background-color': function (ele) {
-                        const palette = [
-                            '#FFADAD',
-                            '#FFD6A5',
-                            '#FDFFB6',
-                            '#CAFFBF',
-                            '#9BF6FF',
-                            '#A0C4FF',
-                            '#BDB2FF',
-                            '#FFC6FF',
-                            '#FFFFFC',
-                        ];
-                        return palette[Math.floor(Math.random() * palette.length)];
+                        return moduleBgColorPalette[Math.floor(Math.random() * moduleBgColorPalette.length)];
                     },
                     'border-style': 'double',
                     'border-width': 1,
