@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Terraform configuration graph">
+    <meta name="author" content="https://github.com/pcasteran/terraform-graph-beautifier">
+
+    <title>{{.PageTitle}}</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.15.0/cytoscape.min.js"
+            integrity="sha256-GxVkCHwpfIWhzOsLbuoswprmQ15n+P5YZfFEf+Tjti8=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/cytoscape-cose-bilkent@4.0.0/cytoscape-cose-bilkent.js"></script>
+</head>
+<style>
+    #cy {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+</style>
+<body>
+<div id="cy"></div>
+<script>
+    const cy = cytoscape({
+        container: document.getElementById('cy'),
+        layout: {
+            //name: 'cose'
+            name: 'cose-bilkent',
+        },
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(label)',
+                    'shape': 'rectangle',
+                    'width': 'label',
+                    'height': 'label',
+                    'padding': '10px',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'background-color': '#EEEEEE',
+                    'border-style': 'solid',
+                    'border-width': 1,
+                    'border-color': '#000000',
+                }
+            },
+            {
+                selector: 'node.resource',
+                style: {
+                    'shape': 'round-rectangle',
+                },
+            },
+            {
+                selector: 'node.var',
+                style: {
+                    'shape': 'ellipse',
+                },
+            },
+            {
+                selector: 'node.local',
+                style: {
+                    'shape': 'ellipse',
+                },
+            },
+            {
+                selector: 'node.output',
+                style: {
+                    'shape': 'cut-rectangle',
+                },
+            },
+            {
+                selector: 'node.module',
+                style: {
+                    'font-weight': 'bold',
+                    'text-valign': 'top',
+                    'text-halign': 'center',
+                    'background-color': function (ele) {
+                        const palette = [
+                            '#FFADAD',
+                            '#FFD6A5',
+                            '#FDFFB6',
+                            '#CAFFBF',
+                            '#9BF6FF',
+                            '#A0C4FF',
+                            '#BDB2FF',
+                            '#FFC6FF',
+                            '#FFFFFC',
+                        ];
+                        return palette[Math.floor(Math.random() * palette.length)];
+                    },
+                    'border-style': 'double',
+                    'border-width': 1,
+                    'border-color': '#000000',
+                }
+            },
+            {
+                selector: 'node.provider',
+                style: {
+                    'shape': 'diamond',
+                    'padding': '25px',
+                },
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 1,
+                    'line-color': '#000000',
+                    'source-arrow-color': '#000000',
+                    'target-arrow-color': '#000000',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+                }
+            },
+            {
+                selector: 'edge.module-module',
+                style: {
+                    'width': 2,
+                    'source-arrow-shape': 'diamond',
+                }
+            }
+            // TODO : edge style depending on target type
+        ],
+        elements: {{.GraphElementsJSON}}
+    });
+</script>
+</body>
+</html>
