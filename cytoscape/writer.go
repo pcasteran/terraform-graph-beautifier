@@ -69,6 +69,7 @@ func getGraphElements(graph *tfgraph.Graph, options *RenderingOptions) *Elements
 			Data: NodeData{
 				ID:    element.GetQualifiedName(),
 				Label: element.GetName(),
+				Type:  element.GetTfType(),
 			},
 			Classes: []string{element.GetTfType()},
 		}
@@ -104,9 +105,11 @@ func getGraphElements(graph *tfgraph.Graph, options *RenderingOptions) *Elements
 		dst := dep.Destination.GetQualifiedName()
 		edge := &Edge{
 			Data: EdgeData{
-				ID:     fmt.Sprintf("%s-%s", src, dst),
-				Source: src,
-				Target: dst,
+				ID:         fmt.Sprintf("%s-%s", src, dst),
+				Source:     src,
+				SourceType: dep.Source.GetTfType(),
+				Target:     dst,
+				TargetType: dep.Destination.GetTfType(),
 			},
 			Classes: []string{fmt.Sprintf("%s-%s", dep.Source.GetTfType(), dep.Destination.GetTfType())},
 		}

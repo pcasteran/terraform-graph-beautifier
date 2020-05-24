@@ -11,7 +11,10 @@ Basic usage:
 ```bash
 cd ${GOPATH}/src/github.com/pcasteran/terraform-graph-beautifier/samples/config1/
 terraform init
-terraform graph | terraform-graph-beautifier > config1.html
+terraform graph | terraform-graph-beautifier \
+    -exclude="module.root.provider" \
+    -output-type=cyto-html \
+    > config1.html
 ```
 
 ## Input and outputs

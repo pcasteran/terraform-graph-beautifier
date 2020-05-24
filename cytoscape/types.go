@@ -5,12 +5,13 @@ package cytoscape
 
 // NodeData represents the element data of a graph node.
 type NodeData struct {
-	// Standard properties
+	// Standard properties.
 	ID     string  `json:"id"`
 	Parent *string `json:"parent,omitempty"`
 
 	// Custom properties.
 	Label string `json:"label"`
+	Type  string `json:"type"`
 }
 
 // Node represents a graph node.
@@ -21,9 +22,14 @@ type Node struct {
 
 // EdgeData represents the element data of a graph edge.
 type EdgeData struct {
+	// Standard properties.
 	ID     string `json:"id"`
 	Source string `json:"source"`
 	Target string `json:"target"`
+
+	// Custom properties.
+	SourceType string `json:"sourceType"`
+	TargetType string `json:"targetType"`
 }
 
 // Edge represents a graph edge.

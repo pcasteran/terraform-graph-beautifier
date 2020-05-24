@@ -105,6 +105,7 @@
             {
                 selector: 'edge',
                 style: {
+                    'line-style': 'solid',
                     'width': 1,
                     'line-color': '#000000',
                     'source-arrow-color': '#000000',
@@ -114,13 +115,24 @@
                 }
             },
             {
-                selector: 'edge.module-module',
+                selector: 'edge[targetType = "var"], edge[targetType = "local"]',
+                style: {
+                    'line-style': 'dotted',
+                }
+            },
+            {
+                selector: 'edge[targetType = "output"]',
+                style: {
+                    'line-style': 'dashed',
+                }
+            },
+            {
+                selector: 'edge[sourceType = "module"][targetType = "module"]',
                 style: {
                     'width': 2,
                     'source-arrow-shape': 'diamond',
                 }
             }
-            // TODO : edge style depending on target type
         ],
         elements: {{.GraphElementsJSON}}
     });
