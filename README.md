@@ -1,4 +1,4 @@
-# terraform-graph-beautifier
+# Terraform graph beautifier
 
 Command line tool allowing to convert the barely usable output of the `terraform graph` command to something more meaningful and explanatory.
 
