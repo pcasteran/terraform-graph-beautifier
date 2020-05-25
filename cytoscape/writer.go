@@ -82,6 +82,9 @@ func getGraphElements(graph *tfgraph.Graph, options *RenderingOptions) *Elements
 		// If the element is a module, recursively add its children.
 		module, ok := element.(*tfgraph.Module)
 		if ok {
+			// Set the parent module ID.
+			node.Data.ParentModuleID = node.Data.Parent
+
 			if !options.EmbedModules && parent != nil {
 				// Remove the parent and create a dependency for the module -> module relation.
 				node.Data.Parent = nil

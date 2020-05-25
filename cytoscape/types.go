@@ -10,8 +10,9 @@ type NodeData struct {
 	Parent *string `json:"parent,omitempty"`
 
 	// Custom properties.
-	Label string `json:"label"`
-	Type  string `json:"type"`
+	Label          string  `json:"label"`
+	Type           string  `json:"type"`
+	ParentModuleID *string `json:"parentModuleID,omitempty"`
 }
 
 // Node represents a graph node.

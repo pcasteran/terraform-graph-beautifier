@@ -24,10 +24,10 @@
 <div id="cy"></div>
 <script>
     // Helper function used to retrieve the scratchpad data of an element.
-    const getScratchPad = function (ele) {
-        let scratchPad = ele.scratch('_tf-graph-beautifier');
+    const getScratchPad = function (element) {
+        let scratchPad = element.scratch('_tf-graph-beautifier');
         if (!scratchPad) {
-            scratchPad = ele.scratch('_tf-graph-beautifier', {});
+            scratchPad = element.scratch('_tf-graph-beautifier', {});
         }
         return scratchPad;
     }
@@ -42,15 +42,14 @@
     const moduleBgColorPalette = ['#b3e2cd', '#fdcdac', '#cbd5e8', '#f4cae4', '#e6f5c9', '#fff2ae', '#f1e2cc', '#cccccc'];
 
     // Returns the color index in the `moduleBgColorPalette` for an element.
-    const getColorIndex = function (ele) {
-        let scratchPad = getScratchPad(ele);
+    const getColorIndex = function (element) {
+        let scratchPad = getScratchPad(element);
         let colorIndex = scratchPad["module-bg-color-index"];
         if (colorIndex === undefined) {
             // Get the color index of the parent (if any).
-            // TODO : handle case of embed-modules = false
-            let parentId = ele.data("parent");
+            let parentId = element.data("parentModuleID");
             if (parentId) {
-                let parent = ele.parent();
+                let parent = element.cy().getElementById(parentId);
                 let parentColorIndex = getColorIndex(parent);
                 colorIndex = (parentColorIndex + 1) % moduleBgColorPalette.length;
             } else {
