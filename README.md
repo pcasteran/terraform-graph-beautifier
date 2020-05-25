@@ -2,6 +2,11 @@
 
 Command line tool allowing to convert the barely usable output of the `terraform graph` command to something more meaningful and explanatory.
 
+| `terraform graph` raw output | Cytoscape.js output |
+| :-: | :-: |
+| ![](doc/config1_raw.png) | ![](doc/config1_cyto_embedded.png) |
+
+
 # Installation
 ```bash
 go get github.com/pcasteran/terraform-graph-beautifier
