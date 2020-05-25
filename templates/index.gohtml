@@ -23,6 +23,15 @@
 <body>
 <div id="cy"></div>
 <script>
+    // Helper function used to retrieve the scratchpad data of an element.
+    const getScratchPad = function (ele) {
+        let scratchPad = ele.scratch('_tf-graph-beautifier');
+        if (!scratchPad) {
+            scratchPad = ele.scratch('_tf-graph-beautifier', {});
+        }
+        return scratchPad;
+    }
+
     // Color palette used for the modules background.
     //
     // This is the "9-class Pastel1" palette from ColorBrewer v2.0.
@@ -42,6 +51,28 @@
         '#fddaec',
         '#f2f2f2'
     ];
+
+    // Returns the color index in the `moduleBgColorPalette` for an element.
+    const getColorIndex = function (ele) {
+        let scratchPad = getScratchPad(ele);
+        let colorIndex = scratchPad["module-bg-color-index"];
+        if (colorIndex === undefined) {
+            // Get the color index of the parent (if any).
+            // TODO : handle case of embed-modules = false
+            let parentId = ele.data("parent");
+            if (parentId) {
+                let parent = ele.parent();
+                let parentColorIndex = getColorIndex(parent);
+                colorIndex = (parentColorIndex + 1) % moduleBgColorPalette.length;
+            } else {
+                colorIndex = 0;
+            }
+
+            scratchPad["module-bg-color-index"] = colorIndex;
+        }
+
+        return colorIndex
+    }
 
     // Create the DOM element used to draw the graph.
     const cy = cytoscape({
@@ -98,7 +129,8 @@
                     'text-valign': 'top',
                     'text-halign': 'center',
                     'background-color': function (ele) {
-                        return moduleBgColorPalette[Math.floor(Math.random() * moduleBgColorPalette.length)];
+                        let colorIndex = getColorIndex(ele);
+                        return moduleBgColorPalette[colorIndex];
                     },
                     'border-style': 'double',
                     'border-width': 1,
