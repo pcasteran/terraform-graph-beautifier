@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"text/template"
 )
 
 // RenderingOptions contains all the options used during graph rendering.
@@ -48,7 +48,7 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	tmpl := template.Must(template.New("cyto-html").Parse(string(b)))
 	err = tmpl.Execute(writer, &map[string]interface{}{
 		"PageTitle":         options.GraphName,
-		"GraphElementsJSON": template.JS(buf.String()),
+		"GraphElementsJSON": buf.String(),
 	})
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot render HTML template")
