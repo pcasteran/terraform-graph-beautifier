@@ -7,11 +7,11 @@
 
     <title>{{.PageTitle}}</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.15.0/cytoscape.min.js"
-            integrity="sha256-GxVkCHwpfIWhzOsLbuoswprmQ15n+P5YZfFEf+Tjti8=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="https://unpkg.com/layout-base/layout-base.js"></script>
     <script src="https://unpkg.com/cose-base/cose-base.js"></script>
     <script src="https://unpkg.com/cytoscape-fcose/cytoscape-fcose.js"></script>
+    <script src="https://unpkg.com/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
 
 </head>
 <style>
@@ -19,11 +19,12 @@
         width: 100%;
         height: 100%;
         position: absolute;
-        top: 0px;
+        top: 30px;
         left: 0px;
     }
 </style>
 <body>
+<b id="collapseAll" style="cursor: pointer;color: darkred">Collapse all</b> / <b id="expandAll" style="cursor: pointer; color: darkslateblue">Expand all</b>
 <div id="cy"></div>
 <script>
     // Helper function used to retrieve the scratchpad data of an element.
@@ -185,10 +186,7 @@
                     'background-color': function (ele) {
                         let colorIndex = getColorIndex(ele);
                         return moduleBgColorPalette[colorIndex];
-                    },
-                    'border-style': 'double',
-                    'border-width': 1,
-                    'border-color': '#000000',
+                    }
                 }
             },
             {
@@ -197,6 +195,18 @@
                     'shape': 'diamond',
                     'padding': '25px',
                 },
+            },
+            {
+                selector: "node.cy-expand-collapse-collapsed-node",
+                style: {
+                    'border-style': 'dashed'
+                }
+            },
+            {
+                selector: ':selected',
+                style: {
+                    "border-width": 2
+                }
             },
             {
                 selector: 'edge',
@@ -228,9 +238,35 @@
                     'width': 2,
                     'source-arrow-shape': 'diamond',
                 }
-            }
+            },
+            {
+                selector: 'edge.cy-expand-collapse-meta-edge',
+                style: {
+                    'visibility': 'hidden'
+                }
+            },
         ],
         elements: {{.GraphElementsJSON}}
+    });
+
+    var expandCollapseApi = cy.expandCollapse({
+        layoutBy: {
+            name: "fcose",
+            animate: "end",
+            randomize: false,
+            fit: true
+        },
+        fisheye: true,
+        animate: false,
+        undoable: false
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", function () {
+        expandCollapseApi.collapseAll();
+    });
+
+    document.getElementById("expandAll").addEventListener("click", function () {
+        expandCollapseApi.expandAll();
     });
 </script>
 </body>
