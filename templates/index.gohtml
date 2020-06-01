@@ -82,11 +82,11 @@
         quality: "proof",
         // Use random node positions at beginning of layout
         // if this is set to false, then quality option must be "proof"
-        randomize: true,
+        randomize: false,
         // Whether or not to animate the layout
-        animate: false,
+        animate: "end",
         // Duration of animation in ms, if enabled
-        animationDuration: 1000,
+        animationDuration: 500,
         // Easing of animation, if enabled
         animationEasing: undefined,
         // Fit the viewport to the repositioned nodes
@@ -142,9 +142,11 @@
     };
 
     // Create the DOM element used to draw the graph.
+    let initialLayoutOptions = Object.assign({}, layoutOptions);
+    initialLayoutOptions["randomize"] = true;
     const cy = cytoscape({
         container: document.getElementById('cy'),
-        layout: layoutOptions,
+        layout: initialLayoutOptions,
         style: [
             {
                 selector: 'node',
@@ -246,6 +248,7 @@
                 style: {
                     'width': 2,
                     'source-arrow-shape': 'diamond',
+                    'curve-style': 'straight',
                 }
             },
             {
@@ -259,12 +262,7 @@
     });
 
     const expandCollapseApi = cy.expandCollapse({
-        layoutBy: {
-            name: "fcose",
-            animate: "end",
-            randomize: false,
-            fit: true
-        },
+        layoutBy: layoutOptions,
         fisheye: true,
         animate: false,
         undoable: false
