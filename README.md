@@ -44,6 +44,19 @@ The loading of the input graph involves the following steps:
 
 The type of output is chosen using the `--output-type` parameter, the possible values are : **cyto-html** (default), **cyto-json** and **graphviz** (see the [Input and outputs](#input-and-outputs) section for the description of the corresponding outputs).
 
+### Modules embedding
+
+An important output configuration option is to choose whether to embed a sub-module in its parent module or not. The `--embed-modules` parameter allows to control this behavior:
+- if **true** (default), the modules subgraphs will be embedded inside their parent;
+- if **false**, all the subgraphs are drawn at the same level and an edge is drawn from a parent to its children.
+
+As a rule of thumb, `--embed-modules=true` works well for small to medium size graphs but for larger ones it can produce a very dense and compact result with a lot of overlapping nodes and intersecting edges.
+
+| Output type | `--embed-modules=true` | `--embed-modules=false` |
+| :-: | :-: | :-: |
+| **cyto-html** | ![](doc/config1_cyto_embedded.png) | ![](doc/config1_cyto_no-embedded.png) |
+| **graphviz** | ![](doc/config1_graphviz_embedded.png) | ![](doc/config1_graphviz_no-embedded.png) |
+
 ### HTML output templating
 The command uses Go [templates](https://golang.org/pkg/text/template/) to create the HTML output.
 The following annotations will be replaced during output generation:
