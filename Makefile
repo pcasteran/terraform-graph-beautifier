@@ -30,3 +30,25 @@ install:
 
 clean:
 	go clean
+
+doc_generate: install
+	cd samples/config1/ && \
+	terraform init && \
+	\
+	terraform graph | terraform-graph-beautifier \
+		--exclude="module.root.provider" \
+		--output-type=cyto-html \
+		> ../../doc/config1.html && \
+	\
+	terraform graph | terraform-graph-beautifier \
+		--exclude="module.root.provider" \
+		--output-type=cyto-json \
+		| jq . \
+		> ../../doc/config1.json && \
+	\
+	terraform graph | terraform-graph-beautifier \
+		--exclude="module.root.provider" \
+		--output-type=graphviz \
+		> ../../doc/config1.gv && \
+	\
+	cd -

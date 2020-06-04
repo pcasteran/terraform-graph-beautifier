@@ -1,0 +1,34 @@
+digraph "config1" {
+	compound=true;
+	newrank=true;
+	rankdir=TB;
+	"module.root.module.random_file.local_file.file"->"module.root.module.random_file.random_string.content"[ shape="", style="solid" ];
+	"module.root.module.random_file.local_file.file"->"module.root.module.random_file.time_static.creation_time"[ shape="", style="solid" ];
+	"module.root.module.random_file.output.file_name"->"module.root.module.random_file.local_file.file"[ shape="", style="solid" ];
+	"module.root.module.random_file.random_string.content"->"module.root.module.random_file.var.file_prefix"[ shape="", style="dotted" ];
+	"module.root.module.random_file.time_static.creation_time"->"module.root.module.random_file.var.file_prefix"[ shape="", style="dotted" ];
+	"module.root.output.file_name"->"module.root.module.random_file.output.file_name"[ shape="", style="dashed" ];
+	subgraph "cluster_module.root" {
+	label="module.root";
+	subgraph "cluster_module.root.module.random_file" {
+	label="module.random_file";
+	subgraph "cluster_module.root.module.random_file.module.noop" {
+	label="module.noop";
+	"module.root.module.random_file.module.noop.null_resource.noop" [ label="null_resource.noop", shape="box", style="rounded" ];
+
+}
+;
+	"module.root.module.random_file.local_file.file" [ label="local_file.file", shape="box", style="rounded" ];
+	"module.root.module.random_file.output.file_name" [ label="output.file_name", shape="note", style="" ];
+	"module.root.module.random_file.random_string.content" [ label="random_string.content", shape="box", style="rounded" ];
+	"module.root.module.random_file.time_static.creation_time" [ label="time_static.creation_time", shape="box", style="rounded" ];
+	"module.root.module.random_file.var.file_prefix" [ label="var.file_prefix", shape="ellipse", style="" ];
+
+}
+;
+	"module.root.output.file_name" [ label="output.file_name", shape="note", style="" ];
+
+}
+;
+
+}
