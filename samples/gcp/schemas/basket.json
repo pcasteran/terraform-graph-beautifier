@@ -1,0 +1,56 @@
+[
+  {
+    "description": "Basket ID",
+    "name": "id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Store ID",
+    "name": "store_id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Point of sale ID",
+    "name": "pos_id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Creation time",
+    "name": "creation_time",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Basket cancellation flag",
+    "name": "cancelled",
+    "type": "BOOLEAN",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "Total items quantity",
+    "name": "total_items",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "Transaction currency ISO code",
+    "name": "currency",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "Total net value not including tax",
+    "name": "total_net_value_wo_tax",
+    "type": "FLOAT",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "Total net value including tax",
+    "name": "total_net_value_w_tax",
+    "type": "FLOAT",
+    "mode": "NULLABLE"
+  }
+]

@@ -6,11 +6,16 @@ module "gcs_buckets" {
   storage_class = "REGIONAL"
   prefix        = var.project_id
   names         = ["raw", "processed"]
+  force_destroy =  {
+    raw       = true
+    processed = true
+  }
   versioning = {
     raw       = false
     processed = true
   }
   labels = {
+    env = var.env
     foo = "bar"
   }
   folders = {
