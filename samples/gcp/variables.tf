@@ -25,3 +25,7 @@ variable "network" {
 variable "subnet" {
   description = "VPC subnet name"
 }
+
+variable "subnet_cidr" {
+  description = "VPC subnet CIDR"
+}

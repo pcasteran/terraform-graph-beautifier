@@ -1,0 +1,44 @@
+[
+  {
+    "description": "Product ID",
+    "name": "id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Product name",
+    "name": "name",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Product description",
+    "name": "description",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "EAN(13)",
+    "name": "ean13",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "SKU",
+    "name": "sku",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "description": "Creation date",
+    "name": "creation_date",
+    "type": "DATE",
+    "mode": "REQUIRED"
+  },
+  {
+    "description": "Last modification time",
+    "name": "last_modification_time",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  }
+]
