@@ -7,7 +7,8 @@ VERSION := $(shell git describe --always --long --dirty)
 all: build
 
 setup:
-	go get -u golang.org/x/lint/golint
+	go get -u golang.org/x/lint/golint && \
+	go get -u github.com/markbates/pkger/cmd/pkger
 
 dep:
 	go mod download
