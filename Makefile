@@ -1,47 +1,42 @@
-OUT := terraform-graph-beautifier
-PKG := github.com/pcasteran/terraform-graph-beautifier
+PROJECT_NAME := "terraform-graph-beautifier"
+PKG := "github.com/pcasteran/${PROJECT_NAME}"
 VERSION := $(shell git describe --always --long --dirty)
 
-.PHONY: all
+.PHONY: all setup dep tidy lint fmt generate build dist install clean doc_generate
+
 all: build
 
-.PHONY: setup
 setup:
-	go get github.com/markbates/pkger/cmd/pkger
+	go get -u golang.org/x/lint/golint && \
+	go get -u github.com/markbates/pkger/cmd/pkger
 
-.PHONY: tools
-tools:
-	go get -u golang.org/x/lint/golint
+dep:
+	go mod download
 
-.PHONY: lint
-lint:
-	golint ./...
-
-.PHONY: fmt
-fmt:
-	go fmt ./...
-
-.PHONY: tidy
 tidy:
 	go mod tidy
 
-.PHONY: generate
-generate:
+lint:
+	golint -set_exit_status ./...
+
+fmt:
+	go fmt ./...
+
+generate: dep
 	pkger
 
-.PHONY: build
-build: generate
-	go build -i -v -o ${OUT}-v${VERSION} -ldflags="-X main.version=${VERSION}" ${PKG}
+build: dep generate
+	go build -i -v -o ${PROJECT_NAME}-${VERSION} -ldflags="-X main.version=${VERSION}" ${PKG}
 
-.PHONY: install
+dist:
+	goreleaser --snapshot --skip-publish --rm-dist
+
 install:
 	go install .
 
-.PHONY: clean
 clean:
 	go clean
 
-.PHONY: doc_generate
 doc_generate: install
 	cd samples/config1/ && \
 	terraform init && \

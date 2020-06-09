@@ -17,3 +17,5 @@
 .idea/
 
 /terraform-graph-beautifier*
+
+dist/
