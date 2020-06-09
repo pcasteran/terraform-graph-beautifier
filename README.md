@@ -43,11 +43,11 @@ The loading of the input graph involves the following steps:
    - These patterns are [Go regexp](https://golang.org/pkg/regexp/) and are matched line by line against the output of the **cleaning** step, so use the `"root.rsc_type.rsc_name"` naming.
    - These patterns are provided using the `--exclude` parameter, you can repeat it multiple times.
 
-## Output configuration`
+## Output configuration
 
 ### Modules embedding
 
-An important output configuration option is to choose whether to embed a sub-module in its parent module or not. The `--embed-modules` parameter allows to control this behavior:
+An important option is to choose whether to embed a sub-module in its parent module or not. The `--embed-modules` parameter allows to control this behavior:
 - if **true** (default), the modules subgraphs will be embedded inside their parent;
 - if **false**, all the subgraphs are drawn at the same level and an edge is drawn from a parent to its children.
 
@@ -60,7 +60,7 @@ As a rule of thumb, `--embed-modules=true` works well for small to medium size g
 
 ### HTML output templating
 The command uses Go [templates](https://golang.org/pkg/text/template/) to create the HTML output.
-The following annotations will be replaced during output generation:
+The following annotations will be replaced during the output generation:
 - **{{.PageTitle}}** : will be replaced by the graph name (see `--graph-name` parameter).
 - **{{.GraphElementsJSON}}** : will be replaced by the graph elements JSON object.
 
