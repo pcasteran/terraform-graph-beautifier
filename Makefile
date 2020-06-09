@@ -2,7 +2,7 @@ PROJECT_NAME := "terraform-graph-beautifier"
 PKG := "github.com/pcasteran/${PROJECT_NAME}"
 VERSION := $(shell git describe --always --long --dirty)
 
-.PHONY: all setup dep tidy lint fmt generate build install clean doc_generate
+.PHONY: all setup dep tidy lint fmt generate build dist install clean doc_generate
 
 all: build
 
@@ -27,6 +27,9 @@ generate: dep
 
 build: dep generate
 	go build -i -v -o ${PROJECT_NAME}-${VERSION} -ldflags="-X main.version=${VERSION}" ${PKG}
+
+dist:
+	goreleaser --snapshot --skip-publish --rm-dist
 
 install:
 	go install .
