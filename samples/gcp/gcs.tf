@@ -1,6 +1,6 @@
 module "gcs_buckets" {
   source        = "terraform-google-modules/cloud-storage/google"
-  version       = "~> 1.6"
+  version       = "~> 1.7.2"
   project_id    = var.project_id
   location      = var.region
   storage_class = "REGIONAL"
