@@ -8,7 +8,7 @@ locals {
 
 module "bigquery" {
   source  = "terraform-google-modules/bigquery/google"
-  version = "~> 4.2"
+  version = "~> 4.3.0"
 
   dataset_id     = "raw"
   dataset_name   = "Raw data"
