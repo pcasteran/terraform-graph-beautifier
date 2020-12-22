@@ -27,7 +27,7 @@ var /* const */ ManagedTerraformTypes = map[string]interface{}{
 // TfConfigElementRegexp allows to match valid Terraform configuration elements and extract their type+name.
 var /* const */ TfConfigElementRegexp = regexp.MustCompile(`^"module.root.(.*)"$`)
 
-// TfModuleRegexp allow to match Terraform modules and extract their name.
+// TfModuleRegexp allows to match Terraform modules and extract their name.
 var /* const */ TfModuleRegexp = regexp.MustCompile(`(module\..*?)\.(.*)`)
 
 // ConfigElement represents a generic Terraform configuration element.

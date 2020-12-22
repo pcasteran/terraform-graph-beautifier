@@ -19,12 +19,17 @@ var /* const */ tfOutputFixes = map[*regexp.Regexp]replaceStruct{
 	regexp.MustCompile(`"\[root] `): {`"module.root.`, false},
 	// Replace : map["foo"] => map['foo']
 	regexp.MustCompile(`\["(.*?)"]`): {"['${1}']", true},
+	// Replace : x.y.z (expand) => x.y.z
+	regexp.MustCompile(`"(.*?) \(expand\)"`): {`"${1}"`, true},
 }
 
 var /* const */ tfJunkMatches = []*regexp.Regexp{
-	regexp.MustCompile(`"module.root.root"`),
-	regexp.MustCompile(`"module.root.meta.count-boundary \(EachMode fixup\)"`),
-	regexp.MustCompile(`"module.root.provider\..* \(close\)"`),
+	regexp.MustCompile(`"module\.root\.root"`),
+	regexp.MustCompile(`"module\.root\.meta\.count-boundary \(EachMode fixup\)"`),
+	regexp.MustCompile(` \(close\)"`),
+	regexp.MustCompile(`"module\.root.*\.provider\[.*].*"`),
+	// Exclude module nodes. They did not exist in TF 12 and there is some code in the following to handle them specifically.
+	regexp.MustCompile(`"module\.root.*\.module\.[^\.]+"`),
 }
 
 func readGraph(reader io.Reader, keepTfJunk bool, excludePatterns []string) *gographviz.Graph {
@@ -52,6 +57,7 @@ func readGraph(reader io.Reader, keepTfJunk bool, excludePatterns []string) *gog
 					Debug().
 					Str("before", previous).
 					Str("after", line).
+					Str("pattern", matchPattern.String()).
 					Msg("Line fixed")
 			}
 		}
