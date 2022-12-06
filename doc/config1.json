@@ -12,6 +12,17 @@
     },
     {
       "data": {
+        "id": "module.root.output.file_name",
+        "parent": "module.root",
+        "label": "output.file_name",
+        "type": "output"
+      },
+      "classes": [
+        "output"
+      ]
+    },
+    {
+      "data": {
         "id": "module.root.module.random_file",
         "parent": "module.root",
         "label": "module.random_file",
@@ -20,28 +31,6 @@
       },
       "classes": [
         "module"
-      ]
-    },
-    {
-      "data": {
-        "id": "module.root.module.random_file.time_static.creation_time",
-        "parent": "module.root.module.random_file",
-        "label": "time_static.creation_time",
-        "type": "resource"
-      },
-      "classes": [
-        "resource"
-      ]
-    },
-    {
-      "data": {
-        "id": "module.root.module.random_file.var.file_prefix",
-        "parent": "module.root.module.random_file",
-        "label": "var.file_prefix",
-        "type": "var"
-      },
-      "classes": [
-        "var"
       ]
     },
     {
@@ -80,17 +69,6 @@
     },
     {
       "data": {
-        "id": "module.root.module.random_file.output.file_name",
-        "parent": "module.root.module.random_file",
-        "label": "output.file_name",
-        "type": "output"
-      },
-      "classes": [
-        "output"
-      ]
-    },
-    {
-      "data": {
         "id": "module.root.module.random_file.random_string.content",
         "parent": "module.root.module.random_file",
         "label": "random_string.content",
@@ -102,13 +80,35 @@
     },
     {
       "data": {
-        "id": "module.root.output.file_name",
-        "parent": "module.root",
+        "id": "module.root.module.random_file.time_static.creation_time",
+        "parent": "module.root.module.random_file",
+        "label": "time_static.creation_time",
+        "type": "resource"
+      },
+      "classes": [
+        "resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.output.file_name",
+        "parent": "module.root.module.random_file",
         "label": "output.file_name",
         "type": "output"
       },
       "classes": [
         "output"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.var.file_prefix",
+        "parent": "module.root.module.random_file",
+        "label": "var.file_prefix",
+        "type": "var"
+      },
+      "classes": [
+        "var"
       ]
     }
   ],

@@ -1,13 +1,13 @@
 # Terraform graph beautifier
 
-Command line tool allowing to convert the barely usable output of the `terraform graph` command to something more meaningful and explanatory.
+Command line tool allowing to convert the barely usable output of the `terraform graph` command to something more meaningful and explanatory.
 
 | `terraform graph` raw output | Processed output |
 | :-: | :-: |
-| ![](doc/config1_raw.png) | ![](doc/config1_cyto_embedded.png) |
+| ![raw ouput](doc/config1_raw.png) | ![cleaned output](doc/config1_cyto_embedded.png) |
 
 
-# Installation
+## Installation
 ```bash
 go get github.com/pcasteran/terraform-graph-beautifier
 ```
@@ -32,7 +32,7 @@ The command performs the following:
     - **cyto-json** : a JSON document of the graph in the Cytoscape.js [format](https://js.cytoscape.org/#notation/elements-json) (see [example](doc/config1.json));
     - **graphviz** : a cleaned and prettier Dot script that can be piped to a Graphviz [rendering command](https://linux.die.net/man/1/dot) (see [example](doc/config1.gv)).
 
-## Input graph loading and processing
+### Input graph loading and processing
 The loading of the input graph involves the following steps:
 1. **Cleaning the Dot script**
    1. Renaming the nodes using a more consistent pattern : `[root] rsc_type.rsc_name` => `module.root.rsc_type.rsc_name`.
@@ -43,9 +43,9 @@ The loading of the input graph involves the following steps:
    - These patterns are [Go regexp](https://golang.org/pkg/regexp/) and are matched line by line against the output of the **cleaning** step, so use the `"root.rsc_type.rsc_name"` naming.
    - These patterns are provided using the `--exclude` parameter, you can repeat it multiple times.
 
-## Output configuration
+### Output configuration
 
-### Modules embedding
+#### Modules embedding
 
 An important option is to choose whether to embed a sub-module in its parent module or not. The `--embed-modules` parameter allows to control this behavior:
 - if **true** (default), the modules subgraphs will be embedded inside their parent;
@@ -55,10 +55,10 @@ As a rule of thumb, `--embed-modules=true` works well for small to medium size g
 
 | Output type | `--embed-modules=true` | `--embed-modules=false` |
 | :-: | :-: | :-: |
-| **cyto-html** | ![](doc/config1_cyto_embedded.png) | ![](doc/config1_cyto_no-embedded.png) |
-| **graphviz** | ![](doc/config1_graphviz_embedded.png) | ![](doc/config1_graphviz_no-embedded.png) |
+| **cyto-html** | ![cytoscape-embedded-modules](doc/config1_cyto_embedded.png) | ![cytoscape-not-embedded-modules](doc/config1_cyto_no-embedded.png) |
+| **graphviz** | ![graphviz-embedded-modules](doc/config1_graphviz_embedded.png) | ![graphviz-not-embedded-modules](doc/config1_graphviz_no-embedded.png) |
 
-### HTML output templating
+#### HTML output templating
 The command uses Go [templates](https://golang.org/pkg/text/template/) to create the HTML output.
 The following annotations will be replaced during the output generation:
 - **{{.PageTitle}}** : will be replaced by the graph name (see `--graph-name` parameter).

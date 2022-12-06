@@ -1,8 +1,10 @@
 name: Release
+
 on:
   release:
     types:
       - published
+
 jobs:
   release:
     name: Release
