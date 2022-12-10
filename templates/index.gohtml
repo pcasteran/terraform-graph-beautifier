@@ -6,13 +6,6 @@
     <meta name="author" content="https://github.com/pcasteran/terraform-graph-beautifier">
 
     <title>{{.PageTitle}}</title>
-
-    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    <script src="https://unpkg.com/layout-base/layout-base.js"></script>
-    <script src="https://unpkg.com/cose-base/cose-base.js"></script>
-    <script src="https://unpkg.com/cytoscape-fcose/cytoscape-fcose.js"></script>
-    <script src="https://unpkg.com/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
-
 </head>
 <style>
     #cy {
@@ -24,12 +17,17 @@
     }
 </style>
 <body>
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/layout-base/layout-base.js"></script>
+<script src="https://unpkg.com/cose-base/cose-base.js"></script>
+<script src="https://unpkg.com/cytoscape-fcose/cytoscape-fcose.js"></script>
+<script src="https://unpkg.com/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
 <p>
-    <b id="collapseAll" style="cursor: pointer;color: darkred">Collapse all</b>
+    <b id="collapse-all" style="cursor: pointer;color: darkred">Collapse all</b>
     /
-    <b id="expandAll" style="cursor: pointer; color: darkslateblue">Expand all</b>
+    <b id="expand-all" style="cursor: pointer; color: darkslateblue">Expand all</b>
     -
-    <b id="runLayout" style="cursor: pointer; color: #598b3d">Run layout</b>
+    <b id="run-layout" style="cursor: pointer; color: #598b3d">Run layout</b>
 </p>
 <div id="cy"></div>
 <script>
@@ -268,15 +266,15 @@
         undoable: false
     });
 
-    document.getElementById("collapseAll").addEventListener("click", function () {
+    document.getElementById("collapse-all").addEventListener("click", function () {
         expandCollapseApi.collapseAll();
     });
 
-    document.getElementById("expandAll").addEventListener("click", function () {
+    document.getElementById("expand-all").addEventListener("click", function () {
         expandCollapseApi.expandAll();
     });
 
-    document.getElementById("runLayout").addEventListener("click", function () {
+    document.getElementById("run-layout").addEventListener("click", function () {
         const layout = cy.layout(layoutOptions);
         layout.run();
     });

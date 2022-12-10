@@ -41,7 +41,7 @@ lint_shell: ## Open a shell in a linter container
 
 .PHONY: setup
 setup:
-	go get -u github.com/markbates/pkger/cmd/pkger
+	go install github.com/markbates/pkger/cmd/pkger
 
 .PHONY: dep
 dep: ## Download the dependencies

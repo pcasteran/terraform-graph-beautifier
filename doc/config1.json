@@ -12,17 +12,6 @@
     },
     {
       "data": {
-        "id": "module.root.output.file_name",
-        "parent": "module.root",
-        "label": "output.file_name",
-        "type": "output"
-      },
-      "classes": [
-        "output"
-      ]
-    },
-    {
-      "data": {
         "id": "module.root.module.random_file",
         "parent": "module.root",
         "label": "module.random_file",
@@ -109,6 +98,17 @@
       },
       "classes": [
         "var"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.output.file_name",
+        "parent": "module.root",
+        "label": "output.file_name",
+        "type": "output"
+      },
+      "classes": [
+        "output"
       ]
     }
   ],
