@@ -3,7 +3,7 @@ name: Static analysis
 on:
   pull_request:
     branches:
-      - "main"
+      - "master"
 
 jobs:
 
@@ -36,5 +36,5 @@ jobs:
         uses: github/super-linter/slim@v4.9.7
         env:
           VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: main
+          DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
