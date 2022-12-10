@@ -6,7 +6,7 @@ module "gcs_buckets" {
   storage_class = "REGIONAL"
   prefix        = var.project_id
   names         = ["raw", "processed"]
-  force_destroy =  {
+  force_destroy = {
     raw       = true
     processed = true
   }
@@ -24,13 +24,13 @@ module "gcs_buckets" {
   }
 
   set_viewer_roles = true
-  bucket_viewers = {
+  bucket_viewers   = {
     raw       = module.service_accounts_v2.iam_emails["foo"]
     processed = module.service_accounts_v2.iam_emails["bar"]
   }
 
   set_creator_roles = true
-  bucket_creators = {
+  bucket_creators   = {
     raw       = module.service_accounts_v2.iam_emails["foo"]
     processed = module.service_accounts_v2.iam_emails["bar"]
   }
