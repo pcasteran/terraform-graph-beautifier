@@ -5,7 +5,7 @@ meaningful and explanatory.
 
 | `terraform graph` raw output | Processed output |
 | :-: | :-: |
-| ![](doc/config1_raw.png) | ![](doc/config1_cyto_embedded.png) |
+| ![?](doc/config1_raw.png) | ![?](doc/config1_cyto_embedded.png) |
 
 ## Installation
 
@@ -72,8 +72,8 @@ a very dense and compact result with a lot of overlapping nodes and intersecting
 
 | Output type | `--embed-modules=true` | `--embed-modules=false` |
 | :-: | :-: | :-: |
-| **cyto-html** | ![](doc/config1_cyto_embedded.png) | ![](doc/config1_cyto_no-embedded.png) |
-| **graphviz** | ![](doc/config1_graphviz_embedded.png) | ![](doc/config1_graphviz_no-embedded.png) |
+| **cyto-html** | ![?](doc/config1_cyto_embedded.png) | ![?](doc/config1_cyto_no-embedded.png) |
+| **graphviz** | ![?](doc/config1_graphviz_embedded.png) | ![?](doc/config1_graphviz_no-embedded.png) |
 
 #### HTML output templating
 

@@ -1,0 +1,115 @@
+name: Build and test
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  pull_request:
+    branches:
+      - "main"
+
+env:
+  IMAGE_NAME: "terraform-graph-beautifier"
+  IMAGE_PLATFORMS: "linux/amd64,linux/arm64"
+
+jobs:
+
+  build_test_publish:
+    name: Build image
+    permissions:
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+    runs-on: ${{ matrix.platform.runner }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker
+        if: ${{ startsWith(matrix.platform.runner, 'macos') }}
+        run: |
+          brew install docker colima
+          colima start
+
+      - name: Set up QEMU
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/setup-qemu-action@v2.1.0
+        with:
+          platforms: ${{ env.IMAGE_PLATFORMS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.2.1
+
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: docker_metadata
+        name: Docker metadata
+        uses: docker/metadata-action@v4.1.1
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=auto
+            suffix=-${{ matrix.language }}-${{ matrix.platform.os }},onlatest=true
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Get main image tag
+        # Take the first tag and make it available as an environment variable.
+        run: echo "DOCKER_IMAGE_TAG=${{ fromJSON(steps.docker_metadata.outputs.json)['tags'][0] }}" >> "${GITHUB_ENV}"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: .
+          build-args: |
+            BASE=${{ matrix.language }}
+            CDKTF_VERSION=${{ env.CDKTF_VERSION }}
+
+          # In case of invocation in the context of a PR, build only for the `linux/amd64` platform.
+          # Otherwise, build for all the required platforms.
+          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || env.IMAGE_PLATFORMS }}
+
+          tags: ${{ steps.docker_metadata.outputs.tags }}
+          labels: ${{ steps.docker_metadata.outputs.labels }}
+
+          # The local registry does not support multi-platform images (see https://github.com/docker/buildx/issues/59).
+          # In case of invocation in the context of a PR, load the image to the local registry as it is single platform.
+          load: ${{ github.event_name == 'pull_request' }}
+          # Otherwise, push the image to the remote registry.
+          push: ${{ github.event_name != 'pull_request' }}
+
+      - name: Run Trivy vulnerability scanner
+        if: ${{ matrix.platform.os == 'linux' }}  # Container scanning only works on linux.
+        uses: aquasecurity/trivy-action@0.8.0
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE_TAG }}
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          security-checks: "vuln,secret,config"
+          severity: "CRITICAL,HIGH"
+
+      - name: Install test framework
+        working-directory: ./test
+        run: npm install
+
+      - name: Test image
+        working-directory: ./test/${{ matrix.language }}
+        run: npx bats .
+        env:
+          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE_TAG }}
