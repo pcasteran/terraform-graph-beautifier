@@ -42,7 +42,7 @@ jobs:
 
 
   build_test_publish:
-    if: false # TODO: temp
+    if: false  # TODO: temp
     name: Build image
     needs: build_binary
     permissions:

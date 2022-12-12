@@ -3,8 +3,7 @@ before:
     - go mod tidy
 
 builds:
-  - id: main
-    env:
+  - env:
       - GO111MODULE=on  # TODO: remove
       - CGO_ENABLED=0
     goos:
@@ -16,8 +15,14 @@ builds:
       - arm64
     hooks:
       post:
-        # Compress the binary.
-        - upx --best --lzma "{{ .Path }}"
+        # Compress the binary (except for windows/arm64)
+        - >-
+          {{- if not ( and (eq .Os "windows") (eq .Arch "arm64") ) -}}
+            upx --best --lzma "{{ .Path }}"
+          {{- else -}}
+            {{- /* NOOP statement */ -}}
+            true
+          {{- end -}}
 
 archives:
   - replacements:
