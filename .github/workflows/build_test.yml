@@ -60,7 +60,7 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           flavor: |
             latest=auto
-            suffix=-${{ matrix.language }}-${{ matrix.platform.os }},onlatest=true
+            suffix=-${{ matrix.platform.os }},onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -75,9 +75,6 @@ jobs:
         uses: docker/build-push-action@v3.2.0
         with:
           context: .
-          build-args: |
-            BASE=${{ matrix.language }}
-            CDKTF_VERSION=${{ env.CDKTF_VERSION }}
 
           # In case of invocation in the context of a PR, build only for the `linux/amd64` platform.
           # Otherwise, build for all the required platforms.
@@ -109,7 +106,7 @@ jobs:
         run: npm install
 
       - name: Test image
-        working-directory: ./test/${{ matrix.language }}
+        working-directory: ./test
         run: npx bats .
         env:
           DOCKER_IMAGE: ${{ env.DOCKER_IMAGE_TAG }}
