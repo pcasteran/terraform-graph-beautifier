@@ -29,7 +29,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist
+          args: build --snapshot --rm-dist
 
       - name: Upload the binaries
         uses: actions/upload-artifact@v3
@@ -40,6 +40,7 @@ jobs:
 
   build_test_publish:
     name: Build image
+    needs: build_binary
     permissions:
       packages: write
     strategy:
@@ -50,6 +51,8 @@ jobs:
             runner: ubuntu-latest
           - os: darwin
             runner: macos-latest
+          - os: windows
+            runner: windows-latest
     runs-on: ${{ matrix.platform.runner }}
     steps:
       - uses: actions/checkout@v3
