@@ -14,6 +14,30 @@ env:
 
 jobs:
 
+  build_binary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --rm-dist
+
+      - name: Upload the binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: bin
+          path: dist/*
+
+
   build_test_publish:
     name: Build image
     permissions:

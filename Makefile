@@ -40,7 +40,7 @@ lint_shell: ## Open a shell in a linter container
 		github/super-linter:slim-v4
 
 .PHONY: setup
-setup:
+setup: ## Install the project requirements.
 	go install github.com/markbates/pkger/cmd/pkger
 
 .PHONY: dep
@@ -48,7 +48,7 @@ dep: ## Download the dependencies
 	go mod download
 
 .PHONY: tidy
-tidy: ## Add missing and remove unused dependencies
+tidy: ## Add the missing and remove the unused dependencies
 	go mod tidy
 
 .PHONY: fmt
@@ -61,7 +61,7 @@ generate: dep ## Runs the code generation
 
 .PHONY: build
 build: dep generate ## Build the project
-	go build -v -ldflags="-X 'main.version=${version}'" .
+	go build -v -ldflags="-w -s -X 'main.version=${version}'" .
 
 .PHONY: install
 install: ## Compile and install the project binary

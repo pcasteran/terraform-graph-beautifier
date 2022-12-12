@@ -1,17 +1,24 @@
 before:
   hooks:
-    - go mod download
+    - go mod tidy
+
 builds:
-  - env:
-      - GO111MODULE=on
+  - id: main
+    env:
+      - GO111MODULE=on  # TODO: remove
       - CGO_ENABLED=0
     goos:
       - darwin
       - linux
       - windows
     goarch:
-      - "386"
       - amd64
+      - arm64
+    hooks:
+      post:
+        # Compress the binary.
+        - upx --best --lzma "{{ .Path }}"
+
 archives:
   - replacements:
       darwin: Darwin
