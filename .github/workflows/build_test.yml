@@ -15,6 +15,7 @@ env:
 jobs:
 
   build_binary:
+    name: Build the binary
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -40,11 +41,48 @@ jobs:
           name: dist
           path: dist/*
 
+  test_binary:
+    name: Test the binary
+    needs: build_binary
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      # TODO: temp for test
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: dist/
+
+      - name: Install the test framework
+        working-directory: ./test
+        run: npm install
+
+      - name: Test the binary
+        working-directory: ./test
+        run: npx bats .
+        env:
+          USE_DOCKER_IMAGE: "false"
+
+
+
+
 
   build_test_publish:
     if: false  # TODO: temp
     name: Build image
-    needs: build_binary
+    needs: test_binary
     permissions:
       packages: write
     strategy:
@@ -132,7 +170,7 @@ jobs:
           security-checks: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
 
-      - name: Install test framework
+      - name: Install the test framework
         working-directory: ./test
         run: npm install
 
