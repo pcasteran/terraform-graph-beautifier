@@ -1,3 +1,5 @@
+project_name: terraform-graph-beautifier
+
 before:
   hooks:
     - go mod tidy
@@ -7,8 +9,8 @@ builds:
       - GO111MODULE=on  # TODO: remove
       - CGO_ENABLED=0
     goos:
-      - darwin
       - linux
+      - darwin
       - windows
     goarch:
       - amd64
@@ -24,17 +26,12 @@ builds:
             true
           {{- end -}}
 
-archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
 checksum:
   name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ .Tag }}-next"
+
 changelog:
   sort: asc
   filters:

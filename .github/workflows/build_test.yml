@@ -37,7 +37,7 @@ jobs:
       - name: Upload the binaries
         uses: actions/upload-artifact@v3
         with:
-          name: bin
+          name: dist
           path: dist/*
 
 

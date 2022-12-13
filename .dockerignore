@@ -8,3 +8,5 @@
 !cytoscape/**/*.go
 !graphviz/**/*.go
 !tfgraph/**/*.go
+!.goreleaser.yml
+!dist/
