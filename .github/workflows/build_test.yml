@@ -47,11 +47,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-    runs-on: ${{ matrix.runner }}
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+          - os: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.platform.runner }}
     steps:
       - uses: actions/checkout@v3
 
@@ -60,24 +63,25 @@ jobs:
           name: dist
           path: dist/
 
-      # TODO: temp for test
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: dist/
+      - name: Copy the binary to test
+        run:
+
+      # TODO : temp for test
+      - run: test/terraform-graph-beautifier -v
 
       - name: Install the test framework
         working-directory: ./test
         run: npm install
 
-      - name: Test the binary
+      - name: Run the tests
         working-directory: ./test
         run: npx bats .
         env:
           USE_DOCKER_IMAGE: "false"
 
-
-
-
+  #
+  #
+  #
 
   build_test_publish:
     if: false  # TODO: temp
