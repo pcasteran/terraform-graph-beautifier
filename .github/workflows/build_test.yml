@@ -67,7 +67,6 @@ jobs:
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier
-          test/terraform-graph-beautifier -v
 
       - name: Install the test framework
         working-directory: ./test
