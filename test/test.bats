@@ -25,7 +25,7 @@ run_executable() {
       return 1
     else
       # Run the binary.
-      terraform-graph-beautifier "${args}"
+      ./terraform-graph-beautifier "${args}"
     fi
 }
 
