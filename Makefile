@@ -61,7 +61,7 @@ generate: dep ## Runs the code generation
 
 .PHONY: build
 build: dep generate ## Build the project
-	go build -v -ldflags="-w -s -X 'main.version=${version}'" .
+	CGO_ENABLED=0 go build -v -ldflags="-w -s -X 'main.version=${version}'" .
 
 .PHONY: install
 install: ## Compile and install the project binary

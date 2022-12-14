@@ -1,17 +1,16 @@
 #!/usr/bin/env bats
 
-load "../node_modules/bats-support/load"
-load "../node_modules/bats-assert/load"
-load "../node_modules/bats-file/load"
-
-load "../common.bash"
+load "node_modules/bats-support/load"
+load "node_modules/bats-assert/load"
+load "node_modules/bats-file/load"
 
 setup() {
-    init_environment
+  echo "TODO"
 }
 
 teardown() {
-    rm *.json *.gv
+  echo "TODO"
+    #rm -f *.json *.gv
 }
 
 run_executable() {
