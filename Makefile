@@ -61,7 +61,7 @@ generate: dep ## Runs the code generation
 
 .PHONY: build
 build: dep generate ## Build the project
-	CGO_ENABLED=0 go build -v -ldflags="-w -s -X 'main.version=${version}'" .
+	CGO_ENABLED=0 go build -v -ldflags="-w -s -X 'main.version=${version}'" -o dist/ .
 
 .PHONY: install
 install: ## Compile and install the project binary
@@ -92,3 +92,16 @@ doc_generate: install ## Generates the static documentation files
 		--exclude="module.root.provider" \
 		--output-type=graphviz \
 		> ${doc_dir}/config1.gv
+
+.PHONY: test_build_image
+test_build_image: ## Build the Docker image used for the tests
+	docker buildx build --tag terraform-graph-beautifier-test test/
+
+.PHONY: test
+test: build ## Run the tests
+	docker run --rm -it \
+	  --user $(shell id -u):$(shell id -g) \
+	  -v $(shell pwd)/dist/terraform-graph-beautifier:/workspace/terraform-graph-beautifier:ro \
+	  -v $(shell pwd)/test/test.bats:/workspace/test.bats:ro \
+	  terraform-graph-beautifier-test \
+	  npx bats .
