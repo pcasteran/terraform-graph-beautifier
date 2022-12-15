@@ -13,11 +13,6 @@ variable "region" {
   type        = string
 }
 
-variable "location" {
-  description = "GCP location for multi-region resources"
-  type        = string
-}
-
 variable "network" {
   description = "VPC network name"
   type        = string
