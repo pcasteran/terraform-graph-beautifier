@@ -1,10 +1,11 @@
 name: Static analysis
 
 on:
-  # TODO: temp for test
-#  pull_request:
-#    branches:
-#      - "master"
+  pull_request:
+    branches:
+      # TODO: temp for test
+      #- "master"
+      - "invalid"
 
 jobs:
 
