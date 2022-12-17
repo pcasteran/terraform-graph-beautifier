@@ -20,7 +20,6 @@ cd samples/config1/
 terraform init
 
 terraform graph | terraform-graph-beautifier \
-    --exclude="module.root.provider" \
     --output-type=cyto-html \
     > config1.html
 ```

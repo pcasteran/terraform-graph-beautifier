@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "module.root",
+        "label": "module.root",
+        "type": "module"
+      },
+      "classes": [
+        "module"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file",
+        "parent": "module.root",
+        "label": "module.random_file",
+        "type": "module",
+        "parentModuleID": "module.root"
+      },
+      "classes": [
+        "module"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.local_file.file",
+        "parent": "module.root.module.random_file",
+        "label": "local_file.file",
+        "type": "resource"
+      },
+      "classes": [
+        "resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.module.noop",
+        "parent": "module.root.module.random_file",
+        "label": "module.noop",
+        "type": "module",
+        "parentModuleID": "module.root.module.random_file"
+      },
+      "classes": [
+        "module"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.module.noop.null_resource.noop",
+        "parent": "module.root.module.random_file.module.noop",
+        "label": "null_resource.noop",
+        "type": "resource"
+      },
+      "classes": [
+        "resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.random_string.content",
+        "parent": "module.root.module.random_file",
+        "label": "random_string.content",
+        "type": "resource"
+      },
+      "classes": [
+        "resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.time_static.creation_time",
+        "parent": "module.root.module.random_file",
+        "label": "time_static.creation_time",
+        "type": "resource"
+      },
+      "classes": [
+        "resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.output.file_name",
+        "parent": "module.root.module.random_file",
+        "label": "output.file_name",
+        "type": "output"
+      },
+      "classes": [
+        "output"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.var.file_prefix",
+        "parent": "module.root.module.random_file",
+        "label": "var.file_prefix",
+        "type": "var"
+      },
+      "classes": [
+        "var"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.output.file_name",
+        "parent": "module.root",
+        "label": "output.file_name",
+        "type": "output"
+      },
+      "classes": [
+        "output"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "id": "module.root.module.random_file.local_file.file-module.root.module.random_file.random_string.content",
+        "source": "module.root.module.random_file.local_file.file",
+        "target": "module.root.module.random_file.random_string.content",
+        "sourceType": "resource",
+        "targetType": "resource"
+      },
+      "classes": [
+        "resource-resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.local_file.file-module.root.module.random_file.time_static.creation_time",
+        "source": "module.root.module.random_file.local_file.file",
+        "target": "module.root.module.random_file.time_static.creation_time",
+        "sourceType": "resource",
+        "targetType": "resource"
+      },
+      "classes": [
+        "resource-resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.output.file_name-module.root.module.random_file.local_file.file",
+        "source": "module.root.module.random_file.output.file_name",
+        "target": "module.root.module.random_file.local_file.file",
+        "sourceType": "output",
+        "targetType": "resource"
+      },
+      "classes": [
+        "output-resource"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.random_string.content-module.root.module.random_file.var.file_prefix",
+        "source": "module.root.module.random_file.random_string.content",
+        "target": "module.root.module.random_file.var.file_prefix",
+        "sourceType": "resource",
+        "targetType": "var"
+      },
+      "classes": [
+        "resource-var"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.module.random_file.time_static.creation_time-module.root.module.random_file.var.file_prefix",
+        "source": "module.root.module.random_file.time_static.creation_time",
+        "target": "module.root.module.random_file.var.file_prefix",
+        "sourceType": "resource",
+        "targetType": "var"
+      },
+      "classes": [
+        "resource-var"
+      ]
+    },
+    {
+      "data": {
+        "id": "module.root.output.file_name-module.root.module.random_file.output.file_name",
+        "source": "module.root.output.file_name",
+        "target": "module.root.module.random_file.output.file_name",
+        "sourceType": "output",
+        "targetType": "output"
+      },
+      "classes": [
+        "output-output"
+      ]
+    }
+  ]
+}

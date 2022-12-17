@@ -78,18 +78,15 @@ doc_generate: install ## Generates the static documentation files
 	cd ${config_dir} && terraform init
 
 	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--exclude="module.root.provider" \
 		--output-type=cyto-html \
 		> ${doc_dir}/config1.html
 
 	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--exclude="module.root.provider" \
 		--output-type=cyto-json \
 		| jq . \
 		> ${doc_dir}/config1.json
 
 	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--exclude="module.root.provider" \
 		--output-type=graphviz \
 		> ${doc_dir}/config1.gv
 
@@ -101,7 +98,29 @@ test_build_image: ## Build the Docker image used for the tests
 test: build ## Run the tests
 	docker run --rm -it \
 	  --user $(shell id -u):$(shell id -g) \
-	  -v $(shell pwd)/dist/terraform-graph-beautifier:/workspace/terraform-graph-beautifier:ro \
-	  -v $(shell pwd)/test/test.bats:/workspace/test.bats:ro \
+	  -v $(shell pwd)/samples:/workspace/samples\
+	  -v $(shell pwd)/dist/terraform-graph-beautifier:/workspace/test/terraform-graph-beautifier:ro \
+	  -v $(shell pwd)/test/test.bats:/workspace/test/test.bats:ro \
+	  -v $(shell pwd)/test/config1_expected.gv:/workspace/test/config1_expected.gv:ro \
+	  -v $(shell pwd)/test/config1_expected.json:/workspace/test/config1_expected.json:ro \
 	  terraform-graph-beautifier-test \
 	  npx bats .
+
+.PHONY: update_terraform_lock
+update_terraform_lock: ## Update the Terraform dependency lock file for all the supported platforms.
+	$(eval config_dir := "samples/config1")
+	cd ${config_dir} && terraform init
+	cd ${config_dir} && terraform providers lock -platform=linux_amd64
+	cd ${config_dir} && terraform providers lock -platform=linux_arm64
+	cd ${config_dir} && terraform providers lock -platform=darwin_amd64
+	cd ${config_dir} && terraform providers lock -platform=darwin_arm64
+	cd ${config_dir} && terraform providers lock -platform=windows_amd64
+
+	$(eval config_dir := "samples/gcp")
+	cd ${config_dir} && terraform init
+	cd ${config_dir} && terraform providers lock -platform=linux_amd64
+	cd ${config_dir} && terraform providers lock -platform=linux_arm64
+	cd ${config_dir} && terraform providers lock -platform=darwin_amd64
+	cd ${config_dir} && terraform providers lock -platform=darwin_arm64
+	cd ${config_dir} && terraform providers lock -platform=windows_amd64
+
