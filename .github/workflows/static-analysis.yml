@@ -3,9 +3,7 @@ name: Static analysis
 on:
   pull_request:
     branches:
-      # TODO: temp for test
-      #- "master"
-      - "invalid"
+      - "master"
 
 jobs:
 
