@@ -39,6 +39,10 @@ get_executable_cmd() {
 }
 
 @test "graphviz" {
+  # TODO
+  echo "*****"
+  cat config1_raw.gv
+  echo "*****"
   run $(get_executable_cmd) --output-type=graphviz < config1_raw.gv
   assert_success
 }
