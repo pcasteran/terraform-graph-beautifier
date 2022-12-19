@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - uses: cloudposse/github-action-pre-commit@v3.0.0
+      - uses: cloudposse/github-action-pre-commit@v3
 
   lint:
     name: lint
@@ -33,7 +33,7 @@ jobs:
         run: sed '/^#/d' .github/super-linter.env >> "${GITHUB_ENV}"
 
       - name: Lint the code base
-        uses: github/super-linter/slim@v4.9.7
+        uses: github/super-linter/slim@v4
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: master

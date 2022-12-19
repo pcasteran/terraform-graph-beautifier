@@ -8,10 +8,6 @@ on:
     branches:
       - "master"
 
-env:
-  IMAGE_NAME: "terraform-graph-beautifier"
-  IMAGE_PLATFORMS: "linux/amd64,linux/arm64"
-
 jobs:
 
   build_binary:
@@ -40,6 +36,8 @@ jobs:
         with:
           name: dist
           path: dist/*
+
+  #####
 
   test_binary:
     name: Test the binary
@@ -92,48 +90,36 @@ jobs:
         env:
           USE_DOCKER_IMAGE: "false"
 
-  #
-  #
-  #
+  #####
 
-  build_test_publish:
-    if: false  # TODO: temp
-    name: Build image
+  build_docker_image:
+    name: Build the Docker image
     needs: test_binary
     permissions:
       packages: write
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - os: linux
-            runner: ubuntu-latest
-          - os: darwin
-            runner: macos-latest
-          - os: windows
-            runner: windows-latest
-    runs-on: ${{ matrix.platform.runner }}
+        os:
+          - linux
+          - darwin
+          - windows
+    runs-on: ubuntu-latest
+    env:
+      PLATFORMS: "${{ matrix.os }}/amd64,${{ matrix.os }}/arm64"
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Docker
-        if: ${{ startsWith(matrix.platform.runner, 'macos') }}
-        run: |
-          brew install docker colima
-          colima start
-
       - name: Set up QEMU
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/setup-qemu-action@v2.1.0
+        uses: docker/setup-qemu-action@v2
         with:
-          platforms: ${{ env.IMAGE_PLATFORMS }}
+          platforms: ${{ env.PLATFORMS }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -141,12 +127,12 @@ jobs:
 
       - id: docker_metadata
         name: Docker metadata
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          images: ghcr.io/${{ github.repository }} # ghcr.io/owner/repository
           flavor: |
             latest=auto
-            suffix=-${{ matrix.platform.os }},onlatest=true
+            suffix=-${{ matrix.os }},onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -158,26 +144,19 @@ jobs:
         run: echo "DOCKER_IMAGE_TAG=${{ fromJSON(steps.docker_metadata.outputs.json)['tags'][0] }}" >> "${GITHUB_ENV}"
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3
         with:
           context: .
-
-          # In case of invocation in the context of a PR, build only for the `linux/amd64` platform.
-          # Otherwise, build for all the required platforms.
-          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || env.IMAGE_PLATFORMS }}
+          platforms: ${{ env.PLATFORMS }}
 
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
-
-          # The local registry does not support multi-platform images (see https://github.com/docker/buildx/issues/59).
-          # In case of invocation in the context of a PR, load the image to the local registry as it is single platform.
-          load: ${{ github.event_name == 'pull_request' }}
-          # Otherwise, push the image to the remote registry.
-          push: ${{ github.event_name != 'pull_request' }}
+          load: false
+          push: true
 
       - name: Run Trivy vulnerability scanner
         if: ${{ matrix.platform.os == 'linux' }}  # Container scanning only works on linux.
-        uses: aquasecurity/trivy-action@0.8.0
+        uses: aquasecurity/trivy-action@0.8
         with:
           image-ref: ${{ env.DOCKER_IMAGE_TAG }}
           format: "table"
@@ -187,12 +166,13 @@ jobs:
           security-checks: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
 
-      - name: Install the test framework
-        working-directory: ./test
-        run: npm install
-
-      - name: Test image
-        working-directory: ./test
-        run: npx bats .
-        env:
-          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE_TAG }}
+      # TODO: temp for test
+#      - name: Install the test framework
+#        working-directory: ./test
+#        run: npm install
+#
+#      - name: Test image
+#        working-directory: ./test
+#        run: npx bats .
+#        env:
+#          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE_TAG }}
