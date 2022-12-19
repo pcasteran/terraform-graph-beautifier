@@ -115,6 +115,9 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Make binaries executable
+        run: chmod +x dist/*/terraform-graph-beautifier
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
