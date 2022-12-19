@@ -55,6 +55,9 @@ jobs:
           - os: windows
             runner: windows-latest
     runs-on: ${{ matrix.platform.runner }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v3
 
@@ -66,7 +69,7 @@ jobs:
       - name: Copy the binary to test
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
-          ${{ matrix.platform.os != 'windows' && 'chmod +x test/terraform-graph-beautifier' || true }}
+          chmod +x test/terraform-graph-beautifier
 
       - name: Get Terraform version from Dockerfile
         run: |
@@ -77,6 +80,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
 
       - name: Install the test framework
         working-directory: ./test
