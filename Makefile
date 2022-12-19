@@ -74,21 +74,20 @@ clean: ## Clean the temporary files
 .PHONY: doc_generate
 doc_generate: install ## Generates the static documentation files
 	$(eval doc_dir := "$(shell pwd)/doc")
-	$(eval config_dir := "samples/config1")
-	cd ${config_dir} && terraform init
-
-	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--output-type=cyto-html \
-		> ${doc_dir}/config1.html
-
-	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--output-type=cyto-json \
-		| jq . \
-		> ${doc_dir}/config1.json
-
-	cd ${config_dir} && terraform graph | terraform-graph-beautifier \
-		--output-type=graphviz \
-		> ${doc_dir}/config1.gv
+	cd "samples/config1" && \
+		terraform init && \
+		terraform graph | terraform-graph-beautifier \
+			--output-type=cyto-html \
+			> ${doc_dir}/config1.html && \
+		\
+		terraform graph | terraform-graph-beautifier \
+			--output-type=cyto-json \
+			| jq . \
+			> ${doc_dir}/config1.json && \
+		\
+		terraform graph | terraform-graph-beautifier \
+			--output-type=graphviz \
+			> ${doc_dir}/config1.gv
 
 .PHONY: test_build_image
 test_build_image: ## Build the Docker image used for the tests
@@ -106,21 +105,18 @@ test: build ## Run the tests
 	  terraform-graph-beautifier-test \
 	  npx bats .
 
+define update_terraform_lock_fn
+    $(eval $@config_dir = $(1))
+    cd ${$@config_dir} && \
+		terraform init && \
+		terraform providers lock -platform=linux_amd64 && \
+		terraform providers lock -platform=linux_arm64 && \
+		terraform providers lock -platform=darwin_amd64 && \
+		terraform providers lock -platform=darwin_arm64 && \
+		terraform providers lock -platform=windows_amd64
+endef
+
 .PHONY: update_terraform_lock
 update_terraform_lock: ## Update the Terraform dependency lock file for all the supported platforms.
-	$(eval config_dir := "samples/config1")
-	cd ${config_dir} && terraform init
-	cd ${config_dir} && terraform providers lock -platform=linux_amd64
-	cd ${config_dir} && terraform providers lock -platform=linux_arm64
-	cd ${config_dir} && terraform providers lock -platform=darwin_amd64
-	cd ${config_dir} && terraform providers lock -platform=darwin_arm64
-	cd ${config_dir} && terraform providers lock -platform=windows_amd64
-
-	$(eval config_dir := "samples/gcp")
-	cd ${config_dir} && terraform init
-	cd ${config_dir} && terraform providers lock -platform=linux_amd64
-	cd ${config_dir} && terraform providers lock -platform=linux_arm64
-	cd ${config_dir} && terraform providers lock -platform=darwin_amd64
-	cd ${config_dir} && terraform providers lock -platform=darwin_arm64
-	cd ${config_dir} && terraform providers lock -platform=windows_amd64
-
+	@$(call update_terraform_lock_fn, "samples/config1")
+	@$(call update_terraform_lock_fn, "samples/gcp")
