@@ -110,6 +110,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
@@ -129,7 +134,7 @@ jobs:
         name: Docker metadata
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }} # ghcr.io/owner/repository
+          images: ghcr.io/${{ github.repository }}  # ghcr.io/owner/repository
           flavor: |
             latest=auto
             suffix=-${{ matrix.os }},onlatest=true
@@ -147,16 +152,15 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          target: binary_from_build_context
           platforms: ${{ env.PLATFORMS }}
-
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
-          load: false
           push: true
 
       - name: Run Trivy vulnerability scanner
-        if: ${{ matrix.platform.os == 'linux' }}  # Container scanning only works on linux.
-        uses: aquasecurity/trivy-action@0.8
+        if: ${{ matrix.os == 'linux' }}  # Container scanning only works on linux.
+        uses: aquasecurity/trivy-action@0.8.0
         with:
           image-ref: ${{ env.DOCKER_IMAGE_TAG }}
           format: "table"
@@ -166,7 +170,7 @@ jobs:
           security-checks: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
 
-      # TODO: temp for test
+# TODO: temp for test
 #      - name: Install the test framework
 #        working-directory: ./test
 #        run: npm install
