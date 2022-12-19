@@ -12,6 +12,7 @@ ARG TARGETARCH
 ARG TERRAFORM_VERSION
 
 # Install the system dependencies.
+# hadolint ignore=DL3008
 RUN apt-get -y update && \
     apt-get -y install --no-install-recommends git wget unzip ca-certificates jq && \
     apt-get clean && \

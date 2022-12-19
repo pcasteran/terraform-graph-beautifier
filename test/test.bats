@@ -6,15 +6,15 @@ load "node_modules/bats-file/load"
 
 setup_file() {
   test_folder=$(pwd)
-  cd ../samples/config1
+  cd ../samples/config1 || exit
   terraform init
-  terraform graph > ${test_folder}/config1_raw.gv
-  cd ${test_folder}
+  terraform graph > "${test_folder}"/config1_raw.gv
+  cd "${test_folder}" || exit
 }
 
 setup() {
   # Remove all artifacts.
-  rm -rf *actual*
+  rm -rf ./*actual*
 }
 
 get_executable_cmd() {

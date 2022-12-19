@@ -5,7 +5,7 @@ ARG USER="appuser"
 
 ##
 
-FROM --platform=${BUILDPLATFORM} golang:${GO_VERSION} AS builder
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
