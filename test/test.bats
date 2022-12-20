@@ -26,7 +26,6 @@ get_executable_cmd() {
     echo "docker run \
       -i \
       --workdir=/test \
-      --platform=${PLATFORM}
       ${DOCKER_IMAGE_TAG}"
   fi
 }

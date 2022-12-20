@@ -92,5 +92,4 @@ jobs:
         working-directory: ./test
         run: npx bats .
         env:
-          PLATFORM: ${{ matrix.platform.os }}/amd64
           DOCKER_IMAGE_TAG: ${{ inputs.test_docker_image && env.DOCKER_IMAGE_TAG || '' }}

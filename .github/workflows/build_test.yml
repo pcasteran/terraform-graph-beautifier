@@ -57,13 +57,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - linux
-          - darwin
-          - windows
+        platform:
+          - os: linux
+            platforms: "linux/amd64,linux/arm64"
+          - os: darwin
+            platforms: "linux/amd64,linux/arm64"
+          - os: windows
+            platforms: "windows/amd64,windows/arm64"
     runs-on: ubuntu-latest
-    env:
-      PLATFORMS: "${{ matrix.os }}/amd64,${{ matrix.os }}/arm64"
     steps:
       - uses: actions/checkout@v3
 
@@ -78,7 +79,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: ${{ env.PLATFORMS }}
+          platforms: ${{ matrix.platform.platforms }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -97,7 +98,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}  # Will give: ghcr.io/owner/repository
           flavor: |
             latest=auto
-            suffix=-${{ matrix.os }},onlatest=true
+            suffix=-${{ matrix.platform.os }},onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -105,31 +106,31 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Export the Docker metadata
-        run: echo "${{ toJSON(steps.docker_metadata.outputs.json) }}" > docker_metadata_${{ matrix.os }}.json
+        run: echo "${{ toJSON(steps.docker_metadata.outputs.json) }}" > docker_metadata_${{ matrix.platform.os }}.json
 
       - name: Upload the Docker metadata
         uses: actions/upload-artifact@v3
         with:
-          name: docker_metadata_${{ matrix.os }}
-          path: docker_metadata_${{ matrix.os }}.json
+          name: docker_metadata_${{ matrix.platform.os }}
+          path: docker_metadata_${{ matrix.platform.os }}.json
           retention-days: 7
 
       - name: Get the first image tag
         # Take the first tag and make it available as an environment variable.
-        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.os }}.json)" >> "${GITHUB_ENV}"
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           target: binary_from_build_context
-          platforms: ${{ env.PLATFORMS }}
+          platforms: ${{ matrix.platform.platforms }}
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
           push: true
 
       - name: Run Trivy vulnerability scanner
-        if: ${{ matrix.os == 'linux' }}  # Container scanning only works on linux.
+        if: ${{ matrix.platform.os == 'linux' }}  # Container scanning only works on linux.
         uses: aquasecurity/trivy-action@0.8.0
         with:
           image-ref: ${{ env.DOCKER_IMAGE_TAG }}
