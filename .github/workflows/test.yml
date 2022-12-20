@@ -38,7 +38,7 @@ jobs:
           path: dist/
 
       - name: Copy the binary to test
-        if: ${{ !test_docker_image }}
+        if: ${{ !inputs.test_docker_image }}
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier
@@ -48,13 +48,13 @@ jobs:
       #
 
       - name: Set up Docker
-        if: ${{ test_docker_image && matrix.platform.os == 'darwin' }}
+        if: ${{ inputs.test_docker_image && matrix.platform.os == 'darwin' }}
         run: |
           brew install docker colima
           colima start
 
       - uses: actions/download-artifact@v3
-        if: ${{ test_docker_image }}
+        if: ${{ inputs.test_docker_image }}
         with:
           name: docker_metadata_${{ matrix.platform.os }}
           path: /
@@ -90,4 +90,4 @@ jobs:
         working-directory: ./test
         run: npx bats .
         env:
-          DOCKER_IMAGE_TAG: ${{ test_docker_image && env.DOCKER_IMAGE_TAG || '' }}
+          DOCKER_IMAGE_TAG: ${{ inputs.test_docker_image && env.DOCKER_IMAGE_TAG || '' }}
