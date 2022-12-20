@@ -23,7 +23,11 @@ get_executable_cmd() {
     echo "./terraform-graph-beautifier"
   else
     # Run the Docker image.
-    echo "docker run -i ${DOCKER_IMAGE_TAG}"
+    echo "docker run \
+      -i \
+      --workdir=/test \
+      --platform=${PLATFORM}
+      ${DOCKER_IMAGE_TAG}"
   fi
 }
 
