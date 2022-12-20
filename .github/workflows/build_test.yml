@@ -36,6 +36,7 @@ jobs:
         with:
           name: dist
           path: dist/*
+          retention-days: 7
 
   #####
 
@@ -102,6 +103,16 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+
+      - name: Export the Docker metadata
+        run: echo "${{ fromJSON(steps.docker_metadata.outputs.json)['tags'][0] }}" > docker_metadata_${{ matrix.os }}.json
+
+      - name: Upload the Docker metadata
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker_metadata_${{ matrix.os }}
+          path: docker_metadata_${{ matrix.os }}.json
+          retention-days: 7
 
       - name: Get main image tag
         # Take the first tag and make it available as an environment variable.

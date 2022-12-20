@@ -40,6 +40,12 @@ jobs:
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier
 
+      - name: Set up Docker
+        if: ${{ inputs.docker_image_tag != '' && matrix.platform.os == 'darwin' }}
+        run: |
+          brew install docker colima
+          colima start
+
       - name: Get Terraform version from Dockerfile
         run: |
           TERRAFORM_VERSION=$(sed -n 's/^.*TERRAFORM_VERSION=\"\(.*\)\"$/\1/p' test/Dockerfile)
