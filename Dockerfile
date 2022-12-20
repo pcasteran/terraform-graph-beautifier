@@ -28,7 +28,7 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} goreleaser build --snapshot --rm-dist 
 
 ##
 
-FROM alpine:${ALPINE_VERSION} AS user_builder
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS user_builder
 
 ARG USER
 
