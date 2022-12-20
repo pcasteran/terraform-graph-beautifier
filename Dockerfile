@@ -57,7 +57,7 @@ ARG TARGETOS
 ARG TARGETARCH
 
 # Copy the static executable from the build context.
-COPY dist/terraform-graph-beautifier_${TARGETOS}_${TARGETARCH}*/terraform-graph-beautifier \
+COPY dist/terraform-graph-beautifier_${TARGETOS}_${TARGETARCH}*/terraform-graph-beautifier* \
      /usr/local/bin/
 
 # Set the container entrypoint.
@@ -72,7 +72,7 @@ ARG TARGETARCH
 
 # Copy the static executable from the builder stage.
 COPY --from=binary_builder \
-     /build/dist/terraform-graph-beautifier_${TARGETOS}_${TARGETARCH}*/terraform-graph-beautifier \
+     /build/dist/terraform-graph-beautifier_${TARGETOS}_${TARGETARCH}*/terraform-graph-beautifier* \
      /usr/local/bin/
 
 # Set the container entrypoint.

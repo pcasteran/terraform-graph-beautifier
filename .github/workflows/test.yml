@@ -1,0 +1,63 @@
+# Reusable workflow allowing to launch the tests on weather the binary or the Docker image.
+
+on:
+  workflow_call:
+    inputs:
+      # Pass `${{ null }}` to launch the tests on the binary.
+      # Pass a valid tag to launch the tests on the specified Docker image.
+      docker_image_tag:
+        type: string
+        required: true
+
+jobs:
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+          - os: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.platform.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Copy the binary to test
+        if: ${{ inputs.docker_image_tag == null }}
+        run: |
+          cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
+          chmod +x test/terraform-graph-beautifier
+
+      - name: Get Terraform version from Dockerfile
+        run: |
+          TERRAFORM_VERSION=$(sed -n 's/^.*TERRAFORM_VERSION=\"\(.*\)\"$/\1/p' test/Dockerfile)
+          echo "TERRAFORM_VERSION=${TERRAFORM_VERSION}" >> "${GITHUB_ENV}"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Install the test framework
+        working-directory: ./test
+        run: npm install
+
+      - name: Run the tests
+        working-directory: ./test
+        run: npx bats .
+        env:
+          # TODO: DOCKER_IMAGE (si non-vide: docker run, sinon ./binaire)
+          USE_DOCKER_IMAGE: ${{ inputs.docker_image_tag != null }}

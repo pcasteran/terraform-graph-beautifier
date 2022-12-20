@@ -42,53 +42,9 @@ jobs:
   test_binary:
     name: Test the binary
     needs: build_binary
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - os: linux
-            runner: ubuntu-latest
-          - os: darwin
-            runner: macos-latest
-          - os: windows
-            runner: windows-latest
-    runs-on: ${{ matrix.platform.runner }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist/
-
-      - name: Copy the binary to test
-        run: |
-          cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
-          chmod +x test/terraform-graph-beautifier
-
-      - name: Get Terraform version from Dockerfile
-        run: |
-          TERRAFORM_VERSION=$(sed -n 's/^.*TERRAFORM_VERSION=\"\(.*\)\"$/\1/p' test/Dockerfile)
-          echo "TERRAFORM_VERSION=${TERRAFORM_VERSION}" >> "${GITHUB_ENV}"
-
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
-
-      - name: Install the test framework
-        working-directory: ./test
-        run: npm install
-
-      - name: Run the tests
-        working-directory: ./test
-        run: npx bats .
-        env:
-          USE_DOCKER_IMAGE: "false"
+    uses: ./.github/workflows/test.yml
+    with:
+      docker_image_tag: ${{ null }}
 
   #####
 
@@ -173,13 +129,12 @@ jobs:
           security-checks: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
 
-# TODO: temp for test
-#      - name: Install the test framework
-#        working-directory: ./test
-#        run: npm install
-#
-#      - name: Test image
-#        working-directory: ./test
-#        run: npx bats .
-#        env:
-#          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE_TAG }}
+  #####
+
+  test_docker_image:
+    name: Test the Docker image
+    needs: build_docker_image
+    uses: ./.github/workflows/test.yml
+    with:
+      # TODO: temp for test: output du job de build (matrix ??)
+      docker_image_tag: "pr-9-linux"
