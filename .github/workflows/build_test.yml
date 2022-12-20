@@ -105,7 +105,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Export the Docker metadata
-        run: echo "${{ steps.docker_metadata.outputs.json }}" > docker_metadata_${{ matrix.os }}.json
+        run: echo "${{ toJSON(steps.docker_metadata.outputs.json) }}" > docker_metadata_${{ matrix.os }}.json
 
       - name: Upload the Docker metadata
         uses: actions/upload-artifact@v3
@@ -143,6 +143,7 @@ jobs:
   #####
 
   test_docker_image:
+    if: false
     name: Test the Docker image
     needs: build_docker_image
     uses: ./.github/workflows/test.yml
