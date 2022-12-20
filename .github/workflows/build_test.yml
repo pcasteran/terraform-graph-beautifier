@@ -45,7 +45,7 @@ jobs:
     needs: build_binary
     uses: ./.github/workflows/test.yml
     with:
-      docker_image_tag: ""  # Empty string to test the binary.
+      test_docker_image: false
 
   #####
 
@@ -114,9 +114,9 @@ jobs:
           path: docker_metadata_${{ matrix.os }}.json
           retention-days: 7
 
-      - name: Get main image tag
+      - name: Get first image tag
         # Take the first tag and make it available as an environment variable.
-        run: echo "DOCKER_IMAGE_TAG=${{ fromJSON(steps.docker_metadata.outputs.json)['tags'][0] }}" >> "${GITHUB_ENV}"
+        run: echo "DOCKER_IMAGE_TAG=$(jq .tags[0] docker_metadata_${{ matrix.os }}.json)" >> "${GITHUB_ENV}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
@@ -143,10 +143,8 @@ jobs:
   #####
 
   test_docker_image:
-    if: false
     name: Test the Docker image
     needs: build_docker_image
     uses: ./.github/workflows/test.yml
     with:
-      # TODO: temp for test: output du job de build (matrix ??)
-      docker_image_tag: "ghcr.io/pcasteran/terraform-graph-beautifier:pr-9-linux"
+      test_docker_image: true

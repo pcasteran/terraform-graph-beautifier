@@ -3,10 +3,8 @@
 on:
   workflow_call:
     inputs:
-      # Pass an empty string (no null value) to launch the tests on the binary.
-      # Pass a valid tag to launch the tests on the specified Docker image.
-      docker_image_tag:
-        type: string
+      test_docker_image:
+        type: boolean
         required: true
 
 jobs:
@@ -29,22 +27,45 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      #
+      # Binary test: download and copy the binary to the test folder.
+      #
+
       - uses: actions/download-artifact@v3
+        if: ${{ !inputs.test_docker_image }}
         with:
           name: dist
           path: dist/
 
       - name: Copy the binary to test
-        if: ${{ inputs.docker_image_tag == '' }}
+        if: ${{ !test_docker_image }}
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier
 
+      #
+      # Docker image test: download the Docker metadata and determine the image tag.
+      #
+
       - name: Set up Docker
-        if: ${{ inputs.docker_image_tag != '' && matrix.platform.os == 'darwin' }}
+        if: ${{ test_docker_image && matrix.platform.os == 'darwin' }}
         run: |
           brew install docker colima
           colima start
+
+      - uses: actions/download-artifact@v3
+        if: ${{ test_docker_image }}
+        with:
+          name: docker_metadata_${{ matrix.platform.os }}
+          path: /
+
+      - name: Get first image tag
+        # Take the first tag and make it available as an environment variable.
+        run: echo "DOCKER_IMAGE_TAG=$(jq .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
+
+      #
+      # Install Terraform.
+      #
 
       - name: Get Terraform version from Dockerfile
         run: |
@@ -57,6 +78,10 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
+      #
+      # Install the test framework and run the tests.
+      #
+
       - name: Install the test framework
         working-directory: ./test
         run: npm install
@@ -65,4 +90,4 @@ jobs:
         working-directory: ./test
         run: npx bats .
         env:
-          DOCKER_IMAGE_TAG: ${{ inputs.docker_image_tag }}
+          DOCKER_IMAGE_TAG: ${{ test_docker_image && env.DOCKER_IMAGE_TAG || '' }}
