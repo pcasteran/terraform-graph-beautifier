@@ -105,7 +105,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Export the Docker metadata
-        run: echo "${{ fromJSON(steps.docker_metadata.outputs.json)['tags'][0] }}" > docker_metadata_${{ matrix.os }}.json
+        run: echo "${{ steps.docker_metadata.outputs.json }}" > docker_metadata_${{ matrix.os }}.json
 
       - name: Upload the Docker metadata
         uses: actions/upload-artifact@v3
