@@ -137,7 +137,7 @@ jobs:
         name: Docker metadata
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}  # ghcr.io/owner/repository
+          images: ghcr.io/${{ github.repository }}  # Will give: ghcr.io/owner/repository
           flavor: |
             latest=auto
             suffix=-${{ matrix.os }},onlatest=true
