@@ -3,7 +3,7 @@
 on:
   workflow_call:
     inputs:
-      # Pass `${{ null }}` to launch the tests on the binary.
+      # Pass an empty string (no null value) to launch the tests on the binary.
       # Pass a valid tag to launch the tests on the specified Docker image.
       docker_image_tag:
         type: string
@@ -35,7 +35,7 @@ jobs:
           path: dist/
 
       - name: Copy the binary to test
-        if: ${{ inputs.docker_image_tag == null }}
+        if: ${{ inputs.docker_image_tag == '' }}
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier

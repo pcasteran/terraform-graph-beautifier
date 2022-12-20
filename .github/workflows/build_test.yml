@@ -44,7 +44,7 @@ jobs:
     needs: build_binary
     uses: ./.github/workflows/test.yml
     with:
-      docker_image_tag: ${{ null }}
+      docker_image_tag: ""  # Empty string to test the binary.
 
   #####
 
@@ -137,4 +137,4 @@ jobs:
     uses: ./.github/workflows/test.yml
     with:
       # TODO: temp for test: output du job de build (matrix ??)
-      docker_image_tag: "pr-9-linux"
+      docker_image_tag: "ghcr.io/pcasteran/terraform-graph-beautifier:pr-9-linux"
