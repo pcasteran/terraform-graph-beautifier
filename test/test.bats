@@ -18,14 +18,12 @@ setup() {
 }
 
 get_executable_cmd() {
-  if [ "${USE_DOCKER_IMAGE}" == "true" ]; then
-    # Run the Docker image.
-    # TODO
-    echo "Not implemented"
-    return 1
-  else
+  if [ -z "${DOCKER_IMAGE_TAG}" ]; then
     # Run the binary.
     echo "./terraform-graph-beautifier"
+  else
+    # Run the Docker image.
+    echo "docker run -i ${DOCKER_IMAGE_TAG}"
   fi
 }
 

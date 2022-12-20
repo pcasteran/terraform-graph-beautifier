@@ -59,5 +59,4 @@ jobs:
         working-directory: ./test
         run: npx bats .
         env:
-          # TODO: DOCKER_IMAGE (si non-vide: docker run, sinon ./binaire)
-          USE_DOCKER_IMAGE: ${{ inputs.docker_image_tag != null }}
+          DOCKER_IMAGE_TAG: ${{ inputs.docker_image_tag }}
