@@ -114,7 +114,7 @@ jobs:
           path: docker_metadata_${{ matrix.os }}.json
           retention-days: 7
 
-      - name: Get first image tag
+      - name: Get the first image tag
         # Take the first tag and make it available as an environment variable.
         run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.os }}.json)" >> "${GITHUB_ENV}"
 

@@ -58,9 +58,9 @@ jobs:
         if: ${{ inputs.test_docker_image }}
         with:
           name: docker_metadata_${{ matrix.platform.os }}
-          path: /
+          path: .
 
-      - name: Get first image tag
+      - name: Get the first image tag
         if: ${{ inputs.test_docker_image }}
         # Take the first tag and make it available as an environment variable.
         run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
