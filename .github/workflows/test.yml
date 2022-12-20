@@ -31,13 +31,14 @@ jobs:
       # Binary test: download and copy the binary to the test folder.
       #
 
-      - uses: actions/download-artifact@v3
+      - name: Download the binary
+        uses: actions/download-artifact@v3
         if: ${{ !inputs.test_docker_image }}
         with:
           name: dist
           path: dist/
 
-      - name: Copy the binary to test
+      - name: Copy the binary
         if: ${{ !inputs.test_docker_image }}
         run: |
           cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
@@ -60,8 +61,9 @@ jobs:
           path: /
 
       - name: Get first image tag
+        if: ${{ inputs.test_docker_image }}
         # Take the first tag and make it available as an environment variable.
-        run: echo "DOCKER_IMAGE_TAG=$(jq .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
 
       #
       # Install Terraform.

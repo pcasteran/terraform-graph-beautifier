@@ -116,7 +116,7 @@ jobs:
 
       - name: Get first image tag
         # Take the first tag and make it available as an environment variable.
-        run: echo "DOCKER_IMAGE_TAG=$(jq .tags[0] docker_metadata_${{ matrix.os }}.json)" >> "${GITHUB_ENV}"
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.os }}.json)" >> "${GITHUB_ENV}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
