@@ -9,17 +9,42 @@ meaningful and explanatory.
 
 ## Installation
 
+You can download the binary corresponding to the required platform from
+the [release](https://github.com/pcasteran/terraform-graph-beautifier/releases) page.
+
+You can also build the binary from the source:
+
 ```bash
 go install github.com/pcasteran/terraform-graph-beautifier
 ```
 
-Basic usage:
+Finally, you can also use
+the [Docker images](https://github.com/pcasteran/terraform-graph-beautifier/pkgs/container/terraform-graph-beautifier)
+available for the Linux and Darwin operating systems:
+
+```bash
+# Linux
+docker pull ghcr.io/pcasteran/terraform-graph-beautifier:latest-linux
+
+# Darwin
+docker pull ghcr.io/pcasteran/terraform-graph-beautifier:latest-darwin
+```
+
+## Basic usage:
 
 ```bash
 cd samples/config1/
 terraform init
 
+# Using the binary.
 terraform graph | terraform-graph-beautifier \
+    --output-type=cyto-html \
+    > config1.html
+
+# Using the Docker image.
+terraform graph | docker run --rm -i \
+    --name terraform-graph-beautifier \
+    ghcr.io/pcasteran/terraform-graph-beautifier:latest-linux \
     --output-type=cyto-html \
     > config1.html
 ```
