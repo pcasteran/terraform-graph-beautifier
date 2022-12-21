@@ -7,6 +7,15 @@ on:
   pull_request:
     branches:
       - "master"
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+      - '.gitignore'
+      - '.hadolint.yaml'
+      - '.pre-commit-config.yaml'
+      - '.yamllint.yaml'
+      - 'LICENSE'
+      - 'Makefile'
 
 jobs:
 
