@@ -1,4 +1,4 @@
-# Reusable workflow allowing to launch the tests on weather the binary or the Docker image.
+# Reusable workflow allowing to launch the tests on whether the binary or the Docker image.
 
 on:
   workflow_call:

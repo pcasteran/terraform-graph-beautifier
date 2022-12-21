@@ -25,7 +25,7 @@ RUN wget -qO terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_
     rm terraform.zip && \
     mv terraform /usr/local/bin/
 
-# Install Install the test framework.
+# Install the test framework.
 WORKDIR /workspace/test
 RUN chmod 777 /workspace/test
 COPY package.json package-lock.json ./
