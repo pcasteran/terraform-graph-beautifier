@@ -12,7 +12,7 @@ meaningful and explanatory.
 You can download the binary corresponding to the required platform from
 the [release](https://github.com/pcasteran/terraform-graph-beautifier/releases) page.
 
-You can also build the binary from the source:
+You can also build the binary from the sources:
 
 ```bash
 go install github.com/pcasteran/terraform-graph-beautifier
@@ -30,7 +30,7 @@ docker pull ghcr.io/pcasteran/terraform-graph-beautifier:latest-linux
 docker pull ghcr.io/pcasteran/terraform-graph-beautifier:latest-darwin
 ```
 
-## Basic usage:
+## Basic usage
 
 ```bash
 cd samples/config1/
