@@ -1,0 +1,30 @@
+version: 2
+updates:
+
+  # Check for updates to GitHub Actions.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Check for updates to Go dependencies.
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Check for updates to Docker dependencies.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "test"
+    schedule:
+      interval: "weekly"
+
+  # Check for updates to npm dependencies.
+  - package-ecosystem: "npm"
+    directory: "test"
+    schedule:
+      interval: "weekly"

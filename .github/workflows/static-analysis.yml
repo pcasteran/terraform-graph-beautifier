@@ -1,0 +1,40 @@
+name: Static analysis
+
+on:
+  pull_request:
+    branches:
+      - "master"
+
+jobs:
+
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - uses: cloudposse/github-action-pre-commit@v3
+
+  lint:
+    name: lint
+    permissions:
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`.
+          fetch-depth: 0
+
+      - name: Load the linter configuration
+        # Read the configuration file and exclude the comments.
+        run: sed '/^#/d' .github/super-linter.env >> "${GITHUB_ENV}"
+
+      - name: Lint the code base
+        uses: github/super-linter/slim@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

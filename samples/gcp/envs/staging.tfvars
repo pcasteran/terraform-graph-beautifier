@@ -1,0 +1,7 @@
+env         = "staging"
+project_id  = "<GCP-project-id>"
+region      = "<GCP region>"
+zone        = "<GCP zone>"
+network     = "<network-name>"
+subnet      = "<subnet-name>"
+subnet_cidr = "10.10.10.0/24"

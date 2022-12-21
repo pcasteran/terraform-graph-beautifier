@@ -1,31 +1,40 @@
+project_name: terraform-graph-beautifier
+
 before:
   hooks:
-    - go mod download
+    - go mod tidy
+
 builds:
-- env:
-  - GO111MODULE=on
-  - CGO_ENABLED=0
-  goos:
-  - darwin
-  - linux
-  - windows
-  goarch:
-  - 386
-  - amd64
-archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
+  - env:
+      - GO111MODULE=on  # TODO: remove
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    hooks:
+      post:
+        # Compress the binary (except for windows/arm64)
+        - >-
+          {{- if not ( and (eq .Os "windows") (eq .Arch "arm64") ) -}}
+            upx --best --lzma "{{ .Path }}"
+          {{- else -}}
+            {{- /* NOOP statement */ -}}
+            true
+          {{- end -}}
+
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ .Tag }}-next"
+
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"

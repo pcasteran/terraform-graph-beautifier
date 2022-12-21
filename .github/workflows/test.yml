@@ -1,0 +1,94 @@
+# Reusable workflow allowing to launch the tests on whether the binary or the Docker image.
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: The operating system for which to execute the tests (linux, darwin, windows)
+        type: string
+        required: true
+      runner:
+        description: The name of the runner on which to execute the tests.
+        type: string
+        required: true
+      test_docker_image:
+        description: True to test the Docker image, false to test the binary.
+        type: boolean
+        required: true
+
+jobs:
+
+  test:
+    runs-on: ${{ inputs.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      #
+      # Binary test: download and copy the binary to the test folder.
+      #
+
+      - name: Download the binary
+        uses: actions/download-artifact@v3
+        if: ${{ !inputs.test_docker_image }}
+        with:
+          name: dist
+          path: dist/
+
+      - name: Copy the binary
+        if: ${{ !inputs.test_docker_image }}
+        run: |
+          cp dist/terraform-graph-beautifier_${{ inputs.os }}_amd64*/terraform-graph-beautifier test/
+          chmod +x test/terraform-graph-beautifier
+
+      #
+      # Docker image test: download the Docker metadata and determine the image tag.
+      #
+
+      - name: Set up Docker
+        if: ${{ inputs.test_docker_image && inputs.os == 'darwin' }}
+        run: |
+          brew install docker colima
+          colima start
+
+      - uses: actions/download-artifact@v3
+        if: ${{ inputs.test_docker_image }}
+        with:
+          name: docker_metadata_${{ inputs.os }}
+          path: .
+
+      - name: Get the first image tag
+        if: ${{ inputs.test_docker_image }}
+        # Take the first tag and make it available as an environment variable.
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ inputs.os }}.json)" >> "${GITHUB_ENV}"
+
+      #
+      # Install Terraform.
+      #
+
+      - name: Get Terraform version from Dockerfile
+        run: |
+          TERRAFORM_VERSION=$(sed -n 's/^.*TERRAFORM_VERSION=\"\(.*\)\"$/\1/p' test/Dockerfile)
+          echo "TERRAFORM_VERSION=${TERRAFORM_VERSION}" >> "${GITHUB_ENV}"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      #
+      # Install the test framework and run the tests.
+      #
+
+      - name: Install the test framework
+        working-directory: ./test
+        run: npm install
+
+      - name: Run the tests
+        working-directory: ./test
+        run: npx bats .
+        env:
+          DOCKER_IMAGE_TAG: ${{ inputs.test_docker_image && env.DOCKER_IMAGE_TAG || '' }}

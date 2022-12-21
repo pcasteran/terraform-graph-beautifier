@@ -1,0 +1,5 @@
+ignored:
+  # Deactivate the rule requiring to pin the dependencies version installed with `apk add ...`.
+  # The Alpine registry contains only one version per package and system version, so there is no need to pin it.
+  # See https://github.com/hadolint/hadolint/issues/464
+  - DL3018

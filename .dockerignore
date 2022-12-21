@@ -1,0 +1,12 @@
+# Ignore everything.
+**
+
+# Except the following.
+!go.mod
+!go.sum
+!*.go
+!cytoscape/**/*.go
+!graphviz/**/*.go
+!tfgraph/**/*.go
+!.goreleaser.yml
+!dist/

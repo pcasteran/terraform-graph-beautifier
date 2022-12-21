@@ -1,0 +1,180 @@
+name: Build and test
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  pull_request:
+    branches:
+      - "master"
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+      - '.gitignore'
+      - '.hadolint.yaml'
+      - '.pre-commit-config.yaml'
+      - '.yamllint.yaml'
+      - 'LICENSE'
+      - 'Makefile'
+
+jobs:
+
+  build_binary:
+    name: Build the binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+
+      - name: Install UPX
+        run: sudo apt-get install -y upx
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --snapshot --rm-dist
+
+      - name: Upload the binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/*
+          retention-days: 7
+
+  #####
+
+  test_binary:
+    name: Test the binary
+    needs: build_binary
+    uses: ./.github/workflows/test.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+          - os: windows
+            runner: windows-latest
+    with:
+      os: ${{ matrix.platform.os }}
+      runner: ${{ matrix.platform.runner }}
+      test_docker_image: false
+
+  #####
+
+  build_docker_image:
+    name: Build the Docker image
+    needs: test_binary
+    permissions:
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            platforms: "linux/amd64,linux/arm64"
+          - os: darwin
+            platforms: "linux/amd64,linux/arm64"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Make binaries executable
+        run: chmod +x dist/*/terraform-graph-beautifier
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: ${{ matrix.platform.platforms }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: docker_metadata
+        name: Generate the Docker metadata
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}  # Will give: ghcr.io/owner/repository
+          flavor: |
+            latest=auto
+            suffix=-${{ matrix.platform.os }},onlatest=true
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Export the Docker metadata
+        run: echo "${{ toJSON(steps.docker_metadata.outputs.json) }}" > docker_metadata_${{ matrix.platform.os }}.json
+
+      - name: Upload the Docker metadata
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker_metadata_${{ matrix.platform.os }}
+          path: docker_metadata_${{ matrix.platform.os }}.json
+          retention-days: 7
+
+      - name: Get the first image tag
+        # Take the first tag and make it available as an environment variable.
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
+
+      - name: Build and push the Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          target: binary_from_build_context
+          platforms: ${{ matrix.platform.platforms }}
+          tags: ${{ steps.docker_metadata.outputs.tags }}
+          labels: ${{ steps.docker_metadata.outputs.labels }}
+          push: true
+
+      - name: Run Trivy vulnerability scanner
+        if: ${{ matrix.platform.os == 'linux' }}  # Container scanning only works on linux.
+        uses: aquasecurity/trivy-action@0.8.0
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE_TAG }}
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          security-checks: "vuln,secret,config"
+          severity: "CRITICAL,HIGH"
+
+  #####
+
+  test_docker_image:
+    name: Test the Docker image
+    needs: build_docker_image
+    uses: ./.github/workflows/test.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+    with:
+      os: ${{ matrix.platform.os }}
+      runner: ${{ matrix.platform.runner }}
+      test_docker_image: true
