@@ -6,25 +6,36 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "ci(deps)"
 
   # Check for updates to Go dependencies.
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
 
   # Check for updates to Docker dependencies.
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
+
   - package-ecosystem: "docker"
     directory: "test"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
 
   # Check for updates to npm dependencies.
   - package-ecosystem: "npm"
     directory: "test"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
