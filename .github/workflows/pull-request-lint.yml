@@ -3,12 +3,9 @@ name: Pull request lint
 on:
   pull_request_target:
     types:
-      - labeled
       - opened
-      - synchronize
-      - reopened
-      - ready_for_review
       - edited
+      - synchronize
 
 jobs:
 
