@@ -6,5 +6,5 @@ require (
 	github.com/awalterschulze/gographviz v2.0.1+incompatible
 	github.com/gobuffalo/here v0.6.2 // indirect
 	github.com/markbates/pkger v0.17.1
-	github.com/rs/zerolog v1.18.0
+	github.com/rs/zerolog v1.28.0
 )
