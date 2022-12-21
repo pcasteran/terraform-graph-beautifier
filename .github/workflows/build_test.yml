@@ -74,8 +74,6 @@ jobs:
             platforms: "linux/amd64,linux/arm64"
           - os: darwin
             platforms: "linux/amd64,linux/arm64"
-          - os: windows
-            platforms: "windows/amd64,windows/arm64"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
