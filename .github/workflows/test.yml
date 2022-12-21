@@ -3,24 +3,23 @@
 on:
   workflow_call:
     inputs:
+      os:
+        description: The operating system for which to execute the tests (linux, darwin, windows)
+        type: string
+        required: true
+      runner:
+        description: The name of the runner on which to execute the tests.
+        type: string
+        required: true
       test_docker_image:
+        description: True to test the Docker image, false to test the binary.
         type: boolean
         required: true
 
 jobs:
 
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - os: linux
-            runner: ubuntu-latest
-          - os: darwin
-            runner: macos-latest
-          - os: windows
-            runner: windows-latest
-    runs-on: ${{ matrix.platform.runner }}
+    runs-on: ${{ inputs.runner }}
     defaults:
       run:
         shell: bash
@@ -41,7 +40,7 @@ jobs:
       - name: Copy the binary
         if: ${{ !inputs.test_docker_image }}
         run: |
-          cp dist/terraform-graph-beautifier_${{ matrix.platform.os }}_amd64*/terraform-graph-beautifier test/
+          cp dist/terraform-graph-beautifier_${{ inputs.os }}_amd64*/terraform-graph-beautifier test/
           chmod +x test/terraform-graph-beautifier
 
       #
@@ -49,7 +48,7 @@ jobs:
       #
 
       - name: Set up Docker
-        if: ${{ inputs.test_docker_image && matrix.platform.os == 'darwin' }}
+        if: ${{ inputs.test_docker_image && inputs.os == 'darwin' }}
         run: |
           brew install docker colima
           colima start
@@ -57,13 +56,13 @@ jobs:
       - uses: actions/download-artifact@v3
         if: ${{ inputs.test_docker_image }}
         with:
-          name: docker_metadata_${{ matrix.platform.os }}
+          name: docker_metadata_${{ inputs.os }}
           path: .
 
       - name: Get the first image tag
         if: ${{ inputs.test_docker_image }}
         # Take the first tag and make it available as an environment variable.
-        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
+        run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ inputs.os }}.json)" >> "${GITHUB_ENV}"
 
       #
       # Install Terraform.

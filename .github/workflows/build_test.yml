@@ -44,7 +44,19 @@ jobs:
     name: Test the binary
     needs: build_binary
     uses: ./.github/workflows/test.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
+          - os: windows
+            runner: windows-latest
     with:
+      os: ${{ matrix.platform.os }}
+      runner: ${{ matrix.platform.runner }}
       test_docker_image: false
 
   #####
@@ -92,7 +104,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: docker_metadata
-        name: Docker metadata
+        name: Generate the Docker metadata
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/${{ github.repository }}  # Will give: ghcr.io/owner/repository
@@ -119,7 +131,7 @@ jobs:
         # Take the first tag and make it available as an environment variable.
         run: echo "DOCKER_IMAGE_TAG=$(jq -r .tags[0] docker_metadata_${{ matrix.platform.os }}.json)" >> "${GITHUB_ENV}"
 
-      - name: Build and push Docker image
+      - name: Build and push the Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -147,5 +159,15 @@ jobs:
     name: Test the Docker image
     needs: build_docker_image
     uses: ./.github/workflows/test.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: linux
+            runner: ubuntu-latest
+          - os: darwin
+            runner: macos-latest
     with:
+      os: ${{ matrix.platform.os }}
+      runner: ${{ matrix.platform.runner }}
       test_docker_image: true
