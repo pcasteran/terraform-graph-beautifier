@@ -7,7 +7,7 @@ on:
 
 jobs:
   goreleaser:
-    name: Release
+    name: GoReleaser
     runs-on: ubuntu-latest
     steps:
 
