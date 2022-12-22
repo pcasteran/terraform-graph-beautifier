@@ -8,7 +8,6 @@ import (
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"text/template"
 )
@@ -41,7 +40,7 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	graphWriter.Flush()
 
 	// Load and execute the template.
-	b, err := ioutil.ReadAll(options.HTMLTemplate)
+	b, err := io.ReadAll(options.HTMLTemplate)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot read HTML template")
 	}
