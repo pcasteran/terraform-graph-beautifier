@@ -32,7 +32,7 @@ get_executable_cmd() {
 }
 
 @test "is executable" {
-  run "$(get_executable_cmd)" -v
+  run $(get_executable_cmd) -v
   assert_success
   assert_output --partial "version:"
   assert_output --partial "commit:"
@@ -41,23 +41,23 @@ get_executable_cmd() {
 }
 
 @test "graphviz" {
-  run "$(get_executable_cmd)" --output-type=graphviz < config1_raw.gv
+  run $(get_executable_cmd) --output-type=graphviz < config1_raw.gv
   assert_success
 }
 
 @test "graphviz - check output" {
-  "$(get_executable_cmd)" --output-type=graphviz < config1_raw.gv > config1_actual.gv
+  $(get_executable_cmd) --output-type=graphviz < config1_raw.gv > config1_actual.gv
   run diff -w config1_expected.gv config1_actual.gv
   assert_success
 }
 
 @test "Cytoscape.js JSON" {
-  run "$(get_executable_cmd)" --output-type=cyto-json < config1_raw.gv
+  run $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv
   assert_success
 }
 
 @test "Cytoscape.js JSON - check output" {
-  "$(get_executable_cmd)" --output-type=cyto-json < config1_raw.gv > config1_actual.json
+  $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv > config1_actual.json
   run diff -w \
     <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_expected.json) \
     <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_actual.json)
@@ -65,23 +65,23 @@ get_executable_cmd() {
 }
 
 @test "Cytoscape.js HTML - default template" {
-  run "$(get_executable_cmd)" --output-type=cyto-html < config1_raw.gv
+  run $(get_executable_cmd) --output-type=cyto-html < config1_raw.gv
   assert_success
   assert_output --partial "<!-- Terraform graph beautifier default template -->"
 }
 
 @test "Cytoscape.js HTML - custom template" {
-  run "$(get_executable_cmd)" --output-type=cyto-html --cyto-html-template=test_template.gohtml < config1_raw.gv
+  run $(get_executable_cmd) --output-type=cyto-html --cyto-html-template=test_template.gohtml < config1_raw.gv
   assert_success
   assert_output --partial "<!-- Terraform graph beautifier test template -->"
 }
 
 @test "exclusion" {
-  run "$(get_executable_cmd)" --output-type=graphviz < config1_raw.gv
+  run $(get_executable_cmd) --output-type=graphviz < config1_raw.gv
   assert_success
   assert_output --partial "module.root.output.file_name"
 
-  run "$(get_executable_cmd)" --exclude=module.root.output.file_name --output-type=graphviz < config1_raw.gv
+  run $(get_executable_cmd) --exclude=module.root.output.file_name --output-type=graphviz < config1_raw.gv
   assert_success
   refute_output --partial "module.root.output.file_name"
 }
