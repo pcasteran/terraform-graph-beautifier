@@ -73,7 +73,14 @@ get_executable_cmd() {
   assert_success
 }
 
-@test "Cytoscape.js HTML" {
+@test "Cytoscape.js HTML - default template" {
   run $(get_executable_cmd) --output-type=cyto-html < config1_raw.gv
   assert_success
+  assert_output --partial "<!-- Terraform graph beautifier default template -->"
+}
+
+@test "Cytoscape.js HTML - custom template" {
+  run $(get_executable_cmd) --output-type=cyto-html --cyto-html-template=test_template.gohtml < config1_raw.gv
+  assert_success
+  assert_output --partial "<!-- Terraform graph beautifier test template -->"
 }

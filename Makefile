@@ -102,6 +102,7 @@ test: build ## Run the tests
 	  -v $(shell pwd)/test/test.bats:/workspace/test/test.bats:ro \
 	  -v $(shell pwd)/test/config1_expected.gv:/workspace/test/config1_expected.gv:ro \
 	  -v $(shell pwd)/test/config1_expected.json:/workspace/test/config1_expected.json:ro \
+	  -v $(shell pwd)/test/test_template.gohtml:/workspace/test/test_template.gohtml:ro \
 	  terraform-graph-beautifier-test \
 	  npx bats .
 
