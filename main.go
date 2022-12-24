@@ -1,17 +1,20 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
-	"github.com/markbates/pkger"
 	"github.com/pcasteran/terraform-graph-beautifier/cytoscape"
 	"github.com/pcasteran/terraform-graph-beautifier/graphviz"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"net/http"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
+
+//go:embed templates/*
+var templates embed.FS
 
 const (
 	outputTypeCytoscapeJSON = "cyto-json"
@@ -102,13 +105,13 @@ func main() {
 		log.Debug().Msg("Output graph to HTML")
 
 		// Open HTML template file.
-		var template http.File = nil
+		var template fs.File = nil
 		if *cytoHTMLTemplatePath != "" {
 			// Use the specified template file.
 			template, err = os.Open(*cytoHTMLTemplatePath)
 		} else {
 			// Use the default template file.
-			template, err = pkger.Open("/templates/index.gohtml")
+			template, err = templates.Open("templates/index.gohtml")
 		}
 		if err != nil {
 			log.Fatal().Err(err).Msg("Cannot open the HTML template file for reading")

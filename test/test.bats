@@ -68,12 +68,16 @@ get_executable_cmd() {
   run $(get_executable_cmd) --output-type=cyto-html < config1_raw.gv
   assert_success
   assert_output --partial "<!-- Terraform graph beautifier default template -->"
+  refute_output --partial "{{.PageTitle}}"
+  refute_output --partial "{{.GraphElementsJSON}}"
 }
 
 @test "Cytoscape.js HTML - custom template" {
   run $(get_executable_cmd) --output-type=cyto-html --cyto-html-template=test_template.gohtml < config1_raw.gv
   assert_success
   assert_output --partial "<!-- Terraform graph beautifier test template -->"
+  refute_output --partial "{{.PageTitle}}"
+  refute_output --partial "{{.GraphElementsJSON}}"
 }
 
 @test "exclusion" {

@@ -8,7 +8,7 @@ import (
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
 	"io"
-	"net/http"
+	"io/fs"
 	"text/template"
 )
 
@@ -16,7 +16,7 @@ import (
 type RenderingOptions struct {
 	GraphName    string
 	EmbedModules bool
-	HTMLTemplate http.File
+	HTMLTemplate fs.File
 }
 
 // WriteGraphJSON writes the specified Terraform graph in Cytoscape.js JSON format.
