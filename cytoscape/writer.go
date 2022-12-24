@@ -8,8 +8,7 @@ import (
 	"github.com/pcasteran/terraform-graph-beautifier/tfgraph"
 	"github.com/rs/zerolog/log"
 	"io"
-	"io/ioutil"
-	"net/http"
+	"io/fs"
 	"text/template"
 )
 
@@ -17,7 +16,7 @@ import (
 type RenderingOptions struct {
 	GraphName    string
 	EmbedModules bool
-	HTMLTemplate http.File
+	HTMLTemplate fs.File
 }
 
 // WriteGraphJSON writes the specified Terraform graph in Cytoscape.js JSON format.
@@ -41,7 +40,7 @@ func WriteGraphHTML(writer io.Writer, graph *tfgraph.Graph, options *RenderingOp
 	graphWriter.Flush()
 
 	// Load and execute the template.
-	b, err := ioutil.ReadAll(options.HTMLTemplate)
+	b, err := io.ReadAll(options.HTMLTemplate)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot read HTML template")
 	}

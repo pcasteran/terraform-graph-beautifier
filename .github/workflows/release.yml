@@ -6,26 +6,24 @@ on:
       - published
 
 jobs:
-  release:
-    name: Release
+  goreleaser:
+    name: GoReleaser
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
         with:
-          go-version: ^1.14
-        id: go
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.19
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
+          distribution: goreleaser
           version: latest
           args: release --rm-dist
         env:

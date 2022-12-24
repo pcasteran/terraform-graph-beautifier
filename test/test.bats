@@ -26,6 +26,7 @@ get_executable_cmd() {
     echo "docker run --rm -i \
       --name terraform-graph-beautifier \
       --workdir=/test \
+      --volume $(pwd)/test_template.gohtml:/test/test_template.gohtml:ro \
       ${DOCKER_IMAGE_TAG}"
   fi
 }
@@ -44,10 +45,39 @@ get_executable_cmd() {
   assert_success
 }
 
-@test "graphviz output" {
+@test "graphviz - check output" {
   $(get_executable_cmd) --output-type=graphviz < config1_raw.gv > config1_actual.gv
   run diff -w config1_expected.gv config1_actual.gv
   assert_success
+}
+
+@test "Cytoscape.js JSON" {
+  run $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv
+  assert_success
+}
+
+@test "Cytoscape.js JSON - check output" {
+  $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv > config1_actual.json
+  run diff -w \
+    <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_expected.json) \
+    <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_actual.json)
+  assert_success
+}
+
+@test "Cytoscape.js HTML - default template" {
+  run $(get_executable_cmd) --output-type=cyto-html < config1_raw.gv
+  assert_success
+  assert_output --partial "<!-- Terraform graph beautifier default template -->"
+  refute_output --partial "{{.PageTitle}}"
+  refute_output --partial "{{.GraphElementsJSON}}"
+}
+
+@test "Cytoscape.js HTML - custom template" {
+  run $(get_executable_cmd) --output-type=cyto-html --cyto-html-template=test_template.gohtml < config1_raw.gv
+  assert_success
+  assert_output --partial "<!-- Terraform graph beautifier test template -->"
+  refute_output --partial "{{.PageTitle}}"
+  refute_output --partial "{{.GraphElementsJSON}}"
 }
 
 @test "exclusion" {
@@ -58,22 +88,4 @@ get_executable_cmd() {
   run $(get_executable_cmd) --exclude=module.root.output.file_name --output-type=graphviz < config1_raw.gv
   assert_success
   refute_output --partial "module.root.output.file_name"
-}
-
-@test "Cytoscape.js JSON" {
-  run $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv
-  assert_success
-}
-
-@test "Cytoscape.js JSON output" {
-  $(get_executable_cmd) --output-type=cyto-json < config1_raw.gv > config1_actual.json
-  run diff -w \
-    <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_expected.json) \
-    <(jq --sort-keys '(. | (.. | arrays) |= sort)' config1_actual.json)
-  assert_success
-}
-
-@test "Cytoscape.js HTML" {
-  run $(get_executable_cmd) --output-type=cyto-html < config1_raw.gv
-  assert_success
 }

@@ -1,10 +1,14 @@
 module github.com/pcasteran/terraform-graph-beautifier
 
-go 1.15
+go 1.19
 
 require (
-	github.com/awalterschulze/gographviz v2.0.1+incompatible
-	github.com/gobuffalo/here v0.6.2 // indirect
-	github.com/markbates/pkger v0.17.1
-	github.com/rs/zerolog v1.18.0
+	github.com/awalterschulze/gographviz v2.0.3+incompatible
+	github.com/rs/zerolog v1.28.0
+)
+
+require (
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.16 // indirect
+	golang.org/x/sys v0.3.0 // indirect
 )

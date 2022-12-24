@@ -113,12 +113,3 @@ in the binary.
 If you want to customize the output, you can provide your own template and specify to use it with
 the `--cyto-html-template` parameter.
 It is good practice to check in your custom templates alongside your Terraform configuration.
-
-## Static assets management
-
-The static assets (HTML templates, ...) are embedded in the binary using [pkger](https://github.com/markbates/pkger).
-The generated `pkged.go` file is checked-in in order for the repository to be "go-gettable".
-
-In development mode, when working on the templates for example, you don't want to launch the `pkged.go` generation
-process every time you modify an asset file; instead you would prefer using the current version of the file.
-To do this, simply configure your IDE to use the build tag `skippkger`.

@@ -33,7 +33,7 @@ FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS user_builder
 ARG USER
 
 # Create a new user.
-# This is done in a separate step as the `addgroup` and `adduser` commands are not available in the scratch image.
+# This is done in a dedicated step as the `addgroup` and `adduser` commands are not available in the scratch image.
 RUN addgroup --gid 1001 --system "${USER}" && \
     adduser  --uid 1001 --ingroup "${USER}" --shell /bin/false --disabled-password --no-create-home --system "${USER}"
 

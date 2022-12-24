@@ -6,7 +6,6 @@ before:
 
 builds:
   - env:
-      - GO111MODULE=on  # TODO: remove
       - CGO_ENABLED=0
     goos:
       - linux
