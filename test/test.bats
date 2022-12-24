@@ -26,6 +26,7 @@ get_executable_cmd() {
     echo "docker run --rm -i \
       --name terraform-graph-beautifier \
       --workdir=/test \
+      --volume test_template.gohtml:/test/test_template.gohtml:ro \
       ${DOCKER_IMAGE_TAG}"
   fi
 }
