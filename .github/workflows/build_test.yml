@@ -35,6 +35,9 @@ jobs:
       - name: Install UPX
         run: sudo apt-get install -y upx
 
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
