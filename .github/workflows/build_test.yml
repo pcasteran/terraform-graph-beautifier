@@ -40,7 +40,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --snapshot --rm-dist
+          args: ${{ startsWith(github.event.ref, 'refs/tags/') && 'release --rm-dist' || 'build --snapshot --rm-dist'}}
 
       - name: Upload the binaries
         uses: actions/upload-artifact@v3
