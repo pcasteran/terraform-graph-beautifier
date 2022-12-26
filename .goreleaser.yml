@@ -37,3 +37,7 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+# Generate a SBOM for each binary built.
+sboms:
+  - artifacts: archive
