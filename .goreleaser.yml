@@ -16,7 +16,7 @@ builds:
       - arm64
     hooks:
       post:
-        # Compress the binary (except for windows/arm64)
+        # Compress the binary (except for windows/arm64).
         - >-
           {{- if not ( and (eq .Os "windows") (eq .Arch "arm64") ) -}}
             upx --best --lzma "{{ .Path }}"
