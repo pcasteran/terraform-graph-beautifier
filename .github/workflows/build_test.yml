@@ -159,6 +159,7 @@ jobs:
       - name: Analyze the image efficiency
         run: |
           docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
             wagoodman/dive:latest \
             --ci \
             --lowestEfficiency=0.95 \
