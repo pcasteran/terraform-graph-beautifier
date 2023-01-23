@@ -17,4 +17,3 @@ jobs:
           password: ${{ secrets.MY_SECRET_PAT }}
           package: terraform-graph-beautifier
           debug: true
-          dry-run: true
