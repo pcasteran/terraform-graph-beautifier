@@ -1,6 +1,7 @@
 name: Static analysis
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - "master"
@@ -30,7 +31,7 @@ jobs:
 
       - name: Load the linter configuration
         # Read the configuration file and exclude the comments.
-        run: sed '/^#/d' .github/super-linter.env >> "${GITHUB_ENV}"
+        run: sed '/^\s*#/d' .github/super-linter.env >> "${GITHUB_ENV}"
 
       - name: Lint the code base
         uses: github/super-linter/slim@v4
