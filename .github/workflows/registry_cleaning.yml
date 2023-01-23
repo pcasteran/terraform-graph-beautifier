@@ -1,0 +1,19 @@
+name: Clean the container registry
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+
+  clean_registry:
+    name: Clean the container registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pcasteran/ghcr-cleaning-action@v1
+        with:
+          password: ${{ secrets.MY_SECRET_PAT }}
+          package: terraform-graph-beautifier
+          debug: true
+          dry-run: true
