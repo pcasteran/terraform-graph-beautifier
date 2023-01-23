@@ -159,12 +159,11 @@ jobs:
       - name: Analyze the image efficiency
         run: |
           docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
             wagoodman/dive:latest \
             --ci \
             --lowestEfficiency=0.95 \
             --highestUserWastedPercent=0.05 \
-            ${{ github.repository }}
+            ${{ env.DOCKER_IMAGE_TAG }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.8.0
