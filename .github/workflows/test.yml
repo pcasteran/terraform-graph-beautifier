@@ -1,5 +1,7 @@
 # Reusable workflow allowing to launch the tests on whether the binary or the Docker image.
 
+name: Execute the tests
+
 on:
   workflow_call:
     inputs:
