@@ -26,7 +26,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       #
       # Binary test: download and copy the binary to the test folder.
