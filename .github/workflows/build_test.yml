@@ -104,7 +104,7 @@ jobs:
         run: chmod +x dist/*/terraform-graph-beautifier
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: ${{ matrix.platform.platforms }}
 
