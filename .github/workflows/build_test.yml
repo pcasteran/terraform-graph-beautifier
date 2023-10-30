@@ -167,7 +167,7 @@ jobs:
             ${{ env.DOCKER_IMAGE_TAG }}
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.12.0
+        uses: aquasecurity/trivy-action@0.13.0
         with:
           image-ref: ${{ env.DOCKER_IMAGE_TAG }}
           format: "table"
