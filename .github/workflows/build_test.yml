@@ -49,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload the binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/*
@@ -136,7 +136,7 @@ jobs:
         run: echo "${{ toJSON(steps.docker_metadata.outputs.json) }}" > docker_metadata_${{ matrix.platform.os }}.json
 
       - name: Upload the Docker metadata
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker_metadata_${{ matrix.platform.os }}
           path: docker_metadata_${{ matrix.platform.os }}.json
