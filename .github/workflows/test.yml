@@ -33,7 +33,7 @@ jobs:
       #
 
       - name: Download the binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         if: ${{ !inputs.test_docker_image }}
         with:
           name: dist
@@ -55,7 +55,7 @@ jobs:
           brew install docker colima
           colima start
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         if: ${{ inputs.test_docker_image }}
         with:
           name: docker_metadata_${{ inputs.os }}
